@@ -1,0 +1,130 @@
+{
+  "checks": [
+    {
+      "name": "Local preview serves HTML",
+      "pass": true,
+      "details": 200
+    },
+    {
+      "name": "3D point scene initialized",
+      "pass": true,
+      "details": 207307
+    },
+    {
+      "name": "No WebGL failure overlay",
+      "pass": true
+    },
+    {
+      "name": "Dragging changes 3D camera",
+      "pass": true,
+      "details": {
+        "before": [
+          0,
+          1.72,
+          6.300000000000001
+        ],
+        "after": [
+          -4.196369286508088,
+          2.126933429595438,
+          5.750570936040752
+        ]
+      }
+    },
+    {
+      "name": "Demo metadata loaded",
+      "pass": true
+    },
+    {
+      "name": "Real audio drives particle energy",
+      "pass": true,
+      "details": {
+        "pointCount": 207307,
+        "camera": [
+          -4.554021286423273e-9,
+          1.7200000004366882,
+          6.300000000000001
+        ],
+        "playing": true,
+        "loading": false,
+        "features": {
+          "energy": 0.1937142899128514,
+          "speed": 0.21649852281897936,
+          "pulse": 0.0010844669894401794,
+          "ready": true
+        },
+        "duration": 48,
+        "currentTime": 4.595494,
+        "contextState": "running",
+        "rhythmEngine": "audio-worklet"
+      }
+    },
+    {
+      "name": "3D scene remains available during playback",
+      "pass": true
+    },
+    {
+      "name": "Real fast passage increases estimated rhythmic activity",
+      "pass": true,
+      "details": {
+        "slow": {
+          "energy": 0.1937142899128514,
+          "speed": 0.21649852281897936,
+          "pulse": 0.0010844669894401794,
+          "ready": true
+        },
+        "fast": {
+          "energy": 0.5461246130956744,
+          "speed": 0.8263443831750584,
+          "pulse": 0.0841910492636376,
+          "ready": true
+        }
+      }
+    },
+    {
+      "name": "Pause settles audio response",
+      "pass": true
+    },
+    {
+      "name": "Settings open",
+      "pass": true
+    },
+    {
+      "name": "Guide opens",
+      "pass": true
+    },
+    {
+      "name": "Local MP4 file selection works",
+      "pass": true
+    },
+    {
+      "name": "MP4 audio enters analysis",
+      "pass": true
+    },
+    {
+      "name": "Invalid drop gets useful feedback",
+      "pass": true
+    },
+    {
+      "name": "Valid drag-and-drop loads local audio",
+      "pass": true
+    },
+    {
+      "name": "Mobile page has no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "Mobile player fits viewport",
+      "pass": true
+    },
+    {
+      "name": "3D scene remains available after resizing",
+      "pass": true
+    },
+    {
+      "name": "No uncaught browser exceptions",
+      "pass": true,
+      "details": []
+    }
+  ],
+  "errors": []
+}
