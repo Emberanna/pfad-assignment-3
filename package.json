@@ -1,0 +1,13 @@
+{
+  "name": "sound-in-the-arbor",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "check": "node --check dist/app.js && node --check dist/scene.js && node --check dist/particle-meadow.js && node --check dist/rhythm-worklet.js && node --test tests/audio-features.test.mjs"
+  }
+}

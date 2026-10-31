@@ -1,1 +1,0 @@
-{"name":"sound-in-the-arbor","version":"0.1.0","private":true,"type":"module","scripts":{"start":"node server.mjs","check":"node --check dist/app.js && node --check dist/scene.js && node --check dist/audio-features.js && node --check dist/rhythm-worklet.js && node --test tests/audio-features.test.mjs"}}

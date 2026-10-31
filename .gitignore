@@ -1,0 +1,12 @@
+node_modules/
+.qa/
+.openai/
+.sites-runtime/
+*.log
+.DS_Store
+Thumbs.db
+*.mp4
+*.mp3
+*.m4a
+*.zip
+*.tar.gz

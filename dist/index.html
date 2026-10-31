@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#15201b">
+  <meta name="description" content="Explore a three-dimensional particle meadow and let your music become light and motion.">
+  <title>Sound in the Arbor</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main id="experience" aria-label="An audio-reactive three-dimensional particle meadow">
+    <canvas id="garden" aria-label="A three-dimensional particle meadow. Drag or use arrow keys to explore, scroll to move closer, and press R to reset." tabindex="0"></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="Sound in the Arbor home">
+        <svg width="34" height="34" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="15" fill="none" stroke="currentColor" stroke-width=".65"/><path d="M18 7v22M7 18h22M10 10l16 16M10 26l16-16" stroke="currentColor" stroke-width=".65"/><circle cx="18" cy="18" r="5" fill="none" stroke="currentColor" stroke-width=".65"/></svg>
+        <span>Sound in the Arbor<small>SOUND IN THE ARBOR</small></span>
+      </a>
+      <div class="top-actions"><span class="edition">INTERACTIVE STUDY <i></i> 001</span><button id="helpButton" class="icon-button" aria-label="Open the guide" title="Guide">?</button><button id="fullscreen" class="icon-button" aria-label="Fullscreen" title="Fullscreen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4H4v4m12-4h4v4M4 16v4h4m8 0h4v-4"/></svg></button></div>
+    </header>
+
+    <section class="scene-intro">
+      <div class="eyebrow"><span></span> THE LISTENING GARDEN</div>
+      <h1>Let sound<br>move through nature.</h1>
+      <p>A little music. A meadow of light.</p>
+    </section>
+
+    <aside class="scene-index" aria-label="Current scene"><span>01</span><div class="index-line"></div><span class="vertical">PARTICLE MEADOW</span></aside>
+
+    <div class="scene-tools"><span class="navigation-hint"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3" width="12" height="18" rx="6"/><path d="M12 3v6"/></svg>Drag to explore <span>·</span> Scroll to move</span><button id="resetView" class="quiet-button">Reset view <span aria-hidden="true">↺</span></button><button id="settingsButton" class="quiet-button" aria-expanded="false" aria-controls="settings">Response settings <span aria-hidden="true">⌁</span></button></div>
+
+    <section id="settings" class="settings" hidden aria-label="Response settings">
+      <div class="settings-heading"><span>Response settings</span><button id="closeSettings" class="icon-button" aria-label="Close response settings">×</button></div>
+      <label for="sensitivity">Audio sensitivity <output id="sensitivityValue">1.0×</output></label><input id="sensitivity" type="range" min="0.5" max="2" value="1" step="0.1">
+      <label for="motion">Movement <output id="motionValue">Balanced</output></label><input id="motion" type="range" min="0" max="1.8" value="0.8" step="0.1">
+      <p>Loudness controls point size; rhythmic activity controls movement speed.</p>
+    </section>
+
+    <section class="music-panel" aria-label="Music player">
+      <div class="panel-topline"><span><i id="statusDot"></i><span id="status">Meadow ready</span></span><span class="local-note"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 9V6a4 4 0 0 1 8 0v3M5 9h10v8H5z"/></svg>Played locally on your device</span></div>
+      <div id="dropzone" class="dropzone">
+        <button id="chooseFile" class="file-chooser"><span class="upload-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m-4 4 4-4 4 4M4 15v5h16v-5"/></svg></span><span><strong>Bring your own music</strong><small>Drop an MP4 or click to browse <span>· MP3 / WAV / M4A also supported</span></small></span></button>
+        <button id="demoButton" class="demo-button">Try the demo <span aria-hidden="true">↗</span></button>
+      </div>
+      <div id="trackArea" class="track-area" hidden>
+        <button id="playButton" class="play-button" aria-label="Play music" disabled><svg id="playIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 11 7-11 7z"/></svg></button>
+        <div class="track-main"><div class="track-head"><span id="trackName">No track selected</span><button id="replaceFile" class="replace-button">Change track</button></div><div class="timeline-row"><span id="currentTime">00:00</span><input id="seek" type="range" min="0" max="1000" value="0" aria-label="Playback position" disabled><span id="duration">00:00</span></div></div>
+        <button id="restart" class="icon-button" aria-label="Restart track" title="Restart track" disabled>↺</button>
+      </div>
+      <div class="panel-bottom"><div class="audio-readings"><span>Loudness <span class="meter" aria-hidden="true"><i id="energyMeter"></i></span><span id="energyText">—</span></span><span>Rhythm <span id="tempoText">Waiting for music</span></span></div><label class="volume-control" for="volume"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4zM15 8c3 2 3 6 0 8m3-11c5 4 5 10 0 14"/></svg><input id="volume" type="range" min="0" max="1" value="0.75" step="0.01" aria-label="Playback volume"></label></div>
+      <p id="message" class="message" role="status" aria-live="polite"></p>
+    </section>
+    <footer class="footer"><span>Sound becomes wind. Particles become memories.</span><span id="renderStatus">Preparing the meadow…</span></footer>
+    <div id="dropOverlay" class="drop-overlay" hidden><div><span>＋</span><p>Drop your music here</p><small>Release to load · Your file is never uploaded</small></div></div>
+    <div id="renderError" class="render-error" hidden><h2>The meadow could not be displayed</h2><p>This scene requires WebGL. Use a browser with hardware acceleration enabled, or reload the page.</p><button onclick="location.reload()">Reload</button></div>
+    <input id="fileInput" type="file" accept=".mp4,.m4a,.mp3,.wav,.ogg,.webm,audio/*,video/mp4,video/webm" hidden>
+    <video id="media" preload="metadata" playsinline hidden></video>
+  </main>
+  <dialog id="helpDialog"><button id="closeHelp" class="icon-button" aria-label="Close guide">×</button><span class="eyebrow">A SMALL GUIDE</span><h2>Listen. The meadow is breathing.</h2><p>Drop or choose a local MP4 or audio file, then press Play.</p><ul><li>Louder sound creates larger points; softer sound creates smaller points.</li><li>Denser note onsets increase movement speed. Sparse or sustained sound lets it settle.</li><li>Drag or use arrow keys to explore. Scroll to move closer. Press R to reset.</li><li>Press Space to play or pause. Response settings adjust sensitivity and movement.</li></ul><p class="help-note">Rhythm is estimated live and may take several seconds to adapt to complex or legato music. Files remain in this browser and must be selected again after a reload.</p><button id="helpDone" class="demo-button">Enter the meadow →</button></dialog>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
