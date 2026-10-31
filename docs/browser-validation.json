@@ -15,6 +15,14 @@
       "pass": true
     },
     {
+      "name": "Night mode selected",
+      "pass": true
+    },
+    {
+      "name": "Dusk mode selected",
+      "pass": true
+    },
+    {
       "name": "Dragging changes 3D camera",
       "pass": true,
       "details": {
@@ -24,9 +32,9 @@
           6.300000000000001
         ],
         "after": [
-          -4.2541430163984755,
-          2.1326316855502383,
-          5.735064893289385
+          -4.212482750740836,
+          2.128719780373129,
+          5.74626905253149
         ]
       }
     },
@@ -40,23 +48,23 @@
       "details": {
         "pointCount": 848496,
         "camera": [
-          -4.8066795417780175e-9,
-          1.7200000004608755,
+          -4.33678171327396e-9,
+          1.7200000004160478,
           6.300000000000001
         ],
         "playing": true,
         "loading": false,
         "features": {
-          "energy": 0.3146633875199802,
-          "speed": 0.21542191528511645,
-          "pulse": 0.01812131033539122,
+          "energy": 0.21087093553013647,
+          "speed": 0.21637603666602334,
+          "pulse": 0.0018095688496974531,
           "ready": true,
-          "low": 0.00014578344625948994,
-          "mid": 0.10845080481150364,
-          "high": 0.000016406614286961235
+          "low": 0.00006303340124332981,
+          "mid": 0.07221904724684937,
+          "high": 0.000002966645947448931
         },
         "duration": 48,
-        "currentTime": 4.261375,
+        "currentTime": 4.533696,
         "contextState": "running",
         "rhythmEngine": "audio-worklet"
       }
@@ -66,26 +74,34 @@
       "pass": true
     },
     {
+      "name": "Mode switch retains playing audio",
+      "pass": true
+    },
+    {
+      "name": "Mode switch retains playback progress",
+      "pass": true
+    },
+    {
       "name": "Real fast passage increases estimated rhythmic activity",
       "pass": true,
       "details": {
         "slow": {
-          "energy": 0.3146633875199802,
-          "speed": 0.21542191528511645,
-          "pulse": 0.01812131033539122,
+          "energy": 0.21087093553013647,
+          "speed": 0.21637603666602334,
+          "pulse": 0.0018095688496974531,
           "ready": true,
-          "low": 0.00014578344625948994,
-          "mid": 0.10845080481150364,
-          "high": 0.000016406614286961235
+          "low": 0.00006303340124332981,
+          "mid": 0.07221904724684937,
+          "high": 0.000002966645947448931
         },
         "fast": {
-          "energy": 0.5472112130593509,
-          "speed": 0.8263443831750598,
+          "energy": 0.5454733844378764,
+          "speed": 0.8263432167776945,
           "pulse": 0.08419104926363641,
           "ready": true,
-          "low": 0.0765130086205868,
-          "mid": 0.2608192125559723,
-          "high": 0.00015092751012880286
+          "low": 0.07238644798983168,
+          "mid": 0.25845194401500804,
+          "high": 0.00015415931197421001
         }
       }
     },
@@ -127,14 +143,6 @@
     },
     {
       "name": "3D scene remains available after resizing",
-      "pass": true
-    },
-    {
-      "name": "Interface language is English",
-      "pass": true
-    },
-    {
-      "name": "No Chinese interface text",
       "pass": true
     },
     {

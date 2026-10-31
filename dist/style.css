@@ -9,3 +9,12 @@
 
 /* English labels need different spacing from the original Chinese typography. */
 .brand>span{font-size:18px;letter-spacing:1px}.brand small{font-size:8px;letter-spacing:2px}.scene-intro h1{letter-spacing:0;line-height:1.25;font-size:clamp(30px,3.1vw,46px)}.scene-intro p{letter-spacing:.5px}.local-note{letter-spacing:0}.file-chooser strong{letter-spacing:.3px}.audio-readings{gap:18px}.scene-tools{letter-spacing:0;gap:18px}.quiet-button{letter-spacing:0}@media(max-width:700px){.brand>span{font-size:15px}.brand small{font-size:7px;letter-spacing:1.4px}.scene-intro h1{font-size:31px}.scene-intro p{max-width:240px;line-height:1.7}.panel-topline{font-size:8px}.local-note{font-size:7px}.file-chooser strong{font-size:14px}.file-chooser small{font-size:8px}.audio-readings{gap:9px}.audio-readings>span{gap:5px}.volume-control input{width:30px}.scene-tools{gap:14px}.quiet-button{font-size:9px}.footer>span:first-child{max-width:210px;letter-spacing:.2px}.vertical{letter-spacing:1px}}
+
+.time-modes{display:flex;border:1px solid var(--line);border-radius:20px;padding:3px;background:#201e2780;gap:2px}.time-modes button{padding:6px 12px;border-radius:16px;font-size:10px;letter-spacing:.5px}.time-modes button[aria-pressed="true"]{background:#d0d8b52a;color:#f4efdb}.time-modes button:hover{background:#d0d8b51a}@media(max-width:700px){.time-modes{position:absolute;right:0;top:52px}.time-modes button{padding:6px 11px}}
+
+/* Frosted player: muted particle silhouettes behind a readable control surface. */
+.music-panel{background:linear-gradient(120deg,rgba(28,41,34,.62),rgba(22,34,28,.70));backdrop-filter:blur(18px) saturate(.75);-webkit-backdrop-filter:blur(18px) saturate(.75);border-color:rgba(225,235,211,.26);box-shadow:inset 0 1px 0 rgba(241,246,227,.08),0 12px 40px rgba(0,0,0,.18)}
+.music-panel .file-chooser strong,.music-panel #trackName{color:#f2f2e3;text-shadow:0 1px 3px rgba(0,0,0,.35)}
+.music-panel .file-chooser small,.music-panel .panel-topline,.music-panel .audio-readings,.music-panel .local-note{color:#d0d9c7}
+.music-panel .demo-button,.music-panel .play-button{background:rgba(28,40,31,.45);border-color:rgba(226,236,209,.32);color:#f0f1de}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.music-panel{background:rgba(25,38,29,.94)}}

@@ -92,3 +92,12 @@ function frame(now){
 requestAnimationFrame(frame);
 // Read-only diagnostics for browser validation; no files, identities or audio leave the browser.
 window.gardenDiagnostics=()=>({pointCount:garden?.count,sceneInfo:garden?.info?.(),camera:garden?.getCamera(),playing,loading,features:{...state},duration:media.duration,currentTime:media.currentTime,contextState:audioContext?.state,rhythmEngine:rhythmNode?'audio-worklet':'spectral-fallback'});
+
+// Lighting changes do not replace the scene or interrupt local audio playback.
+for(const [id,mode] of [['nightMode','night'],['duskMode','dusk']]){
+  $(id).addEventListener('click',()=>{
+    garden?.setTimeOfDay(mode);
+    $('nightMode').setAttribute('aria-pressed',String(mode==='night'));
+    $('duskMode').setAttribute('aria-pressed',String(mode==='dusk'));
+  });
+}
