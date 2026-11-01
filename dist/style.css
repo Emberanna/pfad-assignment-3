@@ -30,3 +30,34 @@
 
 /* Compact unframed return arrow; preserve the original player dimensions. */
 .music-panel{width:min(800px,calc(100% - 88px));padding:18px 25px 12px}.music-return{width:20px;height:14px;min-height:0;padding:0;border:0;border-radius:0;background:transparent}.music-return svg{width:16px;height:16px}.music-return:hover{background:transparent;color:#fff}.panel-topline{min-height:14px}.scene-tools{bottom:244px}@media(max-width:700px){.music-panel{width:calc(100% - 36px);padding:15px 17px 12px}.scene-tools{bottom:237px}}@media(min-width:1600px){.scene-tools{bottom:260px}}@media(max-height:650px) and (min-width:701px){.scene-tools{bottom:227px}}
+
+/* Transparent visual controls and hover-revealed music player. */
+.visual-controls{position:absolute;right:30px;top:150px;width:216px;max-height:calc(100svh - 195px);overflow:auto;z-index:8;background:transparent;color:#edf0df;text-shadow:0 1px 5px #000,0 1px 15px #0009;font-size:10px;padding:6px 0 12px;border-left:1px solid #e1e8ce30;padding-left:18px}.visual-controls-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.visual-controls h2{font:600 12px/1.4 'Segoe UI',sans-serif;letter-spacing:2px;margin:0}.visual-controls-heading button{font-size:22px;width:30px;height:30px}.visual-controls label{display:flex;justify-content:space-between;gap:8px;margin:15px 0 9px;letter-spacing:.6px}.visual-controls output{font-variant-numeric:tabular-nums}.visual-controls input{display:block;width:100%;margin:0;height:4px}.visual-reset{display:block;border:1px solid #e2e8cc55;border-radius:10px;width:100%;padding:10px;margin-top:22px;font-size:10px;background:transparent}.visual-reset:hover{background:#e2e8cc15}
+.player-dock{position:absolute;bottom:59px;left:50%;transform:translateX(-50%);width:min(800px,calc(100% - 88px));z-index:6;pointer-events:auto}.player-dock .music-panel{position:absolute;bottom:0;left:0;transform:none;width:100%;transition:opacity .25s,transform .3s;z-index:1}.player-reveal{display:none;position:absolute;bottom:0;left:50%;transform:translateX(-50%);border:1px solid #dce7bf50;border-radius:18px;padding:9px 20px;background:#18221c50;backdrop-filter:blur(7px);font-size:11px;white-space:nowrap}.player-collapsed .music-panel{opacity:0;pointer-events:none;transform:translateY(12px);visibility:hidden}.player-collapsed .player-reveal{display:block}
+@media(min-width:1200px){.visual-controls{right:36px;width:220px}}
+@media(min-width:1600px){.player-dock{bottom:75px}}
+@media(max-width:700px){.visual-controls{right:20px;top:118px;width:186px;max-height:calc(100svh - 210px);padding-left:12px}.visual-controls-heading{margin-bottom:4px}.visual-controls label{font-size:9px;margin-top:12px}.player-dock{width:calc(100% - 36px);bottom:55px}}
+@media(max-height:650px) and (min-width:701px){.player-dock{bottom:45px}.visual-controls{top:108px;max-height:calc(100svh - 145px)}}
+
+/* Thin white controls sliders. */
+.visual-controls input[type=range]{appearance:none;-webkit-appearance:none;background:transparent;accent-color:#fff;height:16px;cursor:pointer}.visual-controls input[type=range]::-webkit-slider-runnable-track{height:1px;border:0;background:rgba(255,255,255,.85)}.visual-controls input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:6px;height:6px;border:0;border-radius:50%;background:#fff;margin-top:-2.5px;box-shadow:none}.visual-controls input[type=range]::-moz-range-track{height:1px;border:0;background:rgba(255,255,255,.85)}.visual-controls input[type=range]::-moz-range-progress{height:1px;background:#fff}.visual-controls input[type=range]::-moz-range-thumb{width:6px;height:6px;border:0;border-radius:50%;background:#fff}
+
+/* Controls typography follows the scene title; white interaction states. */
+.visual-controls,.visual-controls h2,.visual-controls button,.visual-controls label,.visual-controls output{font-family:"Noto Serif SC","Songti SC",SimSun,serif;font-weight:300;text-shadow:none}.visual-controls h2{font-weight:300}.visual-controls input[type=range]{accent-color:#fff;color:#fff}.visual-controls input[type=range]:focus-visible{outline:1px solid rgba(255,255,255,.8);outline-offset:5px}.visual-controls input[type=range]::-webkit-slider-thumb:active{background:#fff}.visual-controls button:focus-visible{outline:1px solid #fff}
+
+.visual-controls-heading{cursor:pointer}.visual-controls-heading button{font-weight:300;line-height:1;font-size:20px}.visual-controls-heading:hover{color:#fff}
+
+/* Rounded frosted controls without an outlined frame. */
+.visual-controls{border:0;border-left:0;border-radius:20px;padding:16px 18px;background:rgba(24,30,28,.24);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 8px 28px rgba(0,0,0,.10)}.visual-reset{border:0;border-radius:12px;background:rgba(235,240,221,.06)}.visual-reset:hover{background:rgba(235,240,221,.12)}@media(max-width:700px){.visual-controls{padding:12px 14px}}
+
+/* White translucent glass controls. */
+.visual-controls{background:rgba(255,255,255,.16)}
+
+/* Colorless glass: blur the scene without adding any color layer. */
+.visual-controls{background:transparent;box-shadow:none}.visual-reset{background:transparent}.visual-reset:hover{background:transparent}
+
+/* Collapsed controls leave only the right-hand circular arrow. */
+.visual-controls.controls-collapsed{width:32px;height:32px;padding:0;border:0;border-radius:50%;background:transparent;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;overflow:visible}.controls-collapsed .visual-controls-heading{margin:0;width:32px;height:32px}.controls-collapsed .visual-controls-heading h2{display:none}.controls-collapsed #toggleControls{display:grid;place-items:center;width:32px;height:32px;padding:0;border:1px solid rgba(242,246,232,.55);border-radius:50%;background:transparent;font-size:17px}.controls-collapsed #toggleControls:hover{background:rgba(255,255,255,.07)}
+
+/* SVG chevron is centered independently of font metrics. */
+#toggleControls{display:grid;place-items:center;padding:0}#toggleControls svg{display:block;width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}.controls-collapsed #toggleControls svg{width:16px;height:16px;transform:translateY(-.33px)}

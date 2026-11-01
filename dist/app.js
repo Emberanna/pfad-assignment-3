@@ -1,3 +1,4 @@
+import {visualControls,initVisualControls} from './controls.js';
 import {createGarden} from './scene.js';
 import {AudioFeatures} from './audio-features.js';
 import {ExpressiveMotion} from './expressive-motion.js';
@@ -6,6 +7,7 @@ const media=$('media'),fileInput=$('fileInput'),features=new AudioFeatures(),exp
 let garden,audioContext,analyser,source,gainNode,wave,spectrum,objectURL,loadId=0,playing=false,loading=false,lastFrame=performance.now(),lastUI=0;
 let currentFile=null,noAudioSince=null,rhythmNode=null,rhythmData=null,lastAudioTime=null;
 const state={energy:0,speed:0,pulse:0,ready:false};
+initVisualControls(media);
 const format=s=>Number.isFinite(s)?`${Math.floor(s/60).toString().padStart(2,'0')}:${Math.floor(s%60).toString().padStart(2,'0')}`:'00:00';
 function message(text='',error=false){$('message').textContent=text;$('message').classList.toggle('error',error);}
 function status(text){$('status').textContent=text;$('statusDot').classList.toggle('playing',playing);}
@@ -95,7 +97,7 @@ function frame(now){
     if(state.energy<.012){noAudioSince??=audioContext.currentTime;if(audioContext.currentTime-noAudioSince>7)message('No sound detected: this may be a silent passage or an MP4 without a usable audio track. Try another file.');}else{if(noAudioSince&&$('message').textContent.startsWith('No sound detected'))message();noAudioSince=null;}
   }else {Object.assign(state,features.idle(dt));for(const key of ['low','mid','high'])state[key]=(state[key]||0)*Math.exp(-dt*4);}
   Object.assign(state,expressive.update(wave,spectrum,motionDt,state,!!(playing&&analyser&&audioContext?.state==='running'&&!media.seeking)));
-  garden?.render(dt,state,Number($('motion').value));
+  garden?.render(dt,state,Number($('motion').value),visualControls);
   if(now-lastUI>120){
     lastUI=now;$('energyMeter').style.transform=`scaleX(${state.energy.toFixed(3)})`;
     $('energyText').textContent=playing?(state.energy<.12?'Soft':state.energy<.4?'Medium':'Strong'):'—';

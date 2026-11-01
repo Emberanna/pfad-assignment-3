@@ -1,3 +1,4 @@
+import {extremeControlMix} from './controls.js';
 import * as THREE from './assets/three.module.js';
 import {buildMeadow} from './particle-meadow.js';
 import {createIndividualAttributes,individualMotionGLSL,sampleMotion} from './particle-motion.js';
@@ -104,7 +105,7 @@ export async function createGarden(canvas) {
       varying float vCaster;void main(){if(vCaster<.5||length(gl_PointCoord-.5)>.5)discard;gl_FragColor=packDepthToRGBA(gl_FragCoord.z);}`});
   const shadowScene=new THREE.Scene();shadowScene.background=new THREE.Color(1,1,1);const casters=new THREE.Points(geometry,shadowMaterial);casters.frustumCulled=false;shadowScene.add(casters);
   renderer.setRenderTarget(shadowTarget);renderer.render(shadowScene,shadowCamera);renderer.setRenderTarget(null);
-  const uniforms={uAmplitude:{value:0},uRelease:{value:0},uFlowFast:{value:0},uFlowSlow:{value:0},uBurstFast:{value:0},uBurstSlow:{value:0},uDriveSlow:{value:0},uFlow:{value:0},uBurst:{value:0},uDrive:{value:0},uDaylight:{value:1},uLow:{value:0},uMid:{value:0},uHigh:{value:0},uPhase:{value:0},uEnergy:{value:0},uScale:{value:800},uMotion:{value:.8},uPulse:{value:0},uFog:{value:new THREE.Color('#302732')},uShadowMap:{value:shadowTarget.texture},uShadowMatrix:{value:shadowMatrix},uSunDirection:{value:new THREE.Vector3()},uSunColor:{value:new THREE.Color()},uSkyColor:{value:new THREE.Color()},uGroundColor:{value:new THREE.Color()}};
+  const uniforms={uExtreme:{value:0},uSize:{value:1},uColorGain:{value:0},uAmplitude:{value:0},uRelease:{value:0},uFlowFast:{value:0},uFlowSlow:{value:0},uBurstFast:{value:0},uBurstSlow:{value:0},uDriveSlow:{value:0},uFlow:{value:0},uBurst:{value:0},uDrive:{value:0},uDaylight:{value:1},uLow:{value:0},uMid:{value:0},uHigh:{value:0},uPhase:{value:0},uEnergy:{value:0},uScale:{value:800},uMotion:{value:.8},uPulse:{value:0},uFog:{value:new THREE.Color('#302732')},uShadowMap:{value:shadowTarget.texture},uShadowMatrix:{value:shadowMatrix},uSunDirection:{value:new THREE.Vector3()},uSunColor:{value:new THREE.Color()},uSkyColor:{value:new THREE.Color()},uGroundColor:{value:new THREE.Color()}};
   updateLighting();
   const material=new THREE.ShaderMaterial({
     uniforms,vertexColors:true,transparent:true,depthWrite:true,depthTest:true,
@@ -112,7 +113,7 @@ export async function createGarden(canvas) {
       uniform float uDaylight;uniform vec3 uSunDirection,uSunColor,uSkyColor,uGroundColor;
       uniform mat4 uShadowMatrix;varying vec3 shadowPosition;
       attribute vec4 aIndividual;attribute float aMotionWeight;attribute float aSize;attribute float aMobility;attribute float aSeed;
-      uniform float uAmplitude,uRelease;uniform float uFlowFast,uFlowSlow,uBurstFast,uBurstSlow,uDriveSlow;uniform float uFlow,uBurst,uDrive;uniform float uPhase,uEnergy,uScale,uMotion,uPulse,uLow,uMid,uHigh;varying vec3 vColor;varying vec3 ambientColor;varying vec3 unlitColor;varying float vBokeh;varying float vPlantOpacity;varying float vDistance;
+      uniform float uExtreme;uniform float uSize;uniform float uAmplitude,uRelease;uniform float uFlowFast,uFlowSlow,uBurstFast,uBurstSlow,uDriveSlow;uniform float uFlow,uBurst,uDrive;uniform float uPhase,uEnergy,uScale,uMotion,uPulse,uLow,uMid,uHigh;varying vec3 vColor;varying vec3 ambientColor;varying vec3 unlitColor;varying float vBokeh;varying float vPlantOpacity;varying float vDistance;
       void main(){vec3 p=position+aDuskOffset*uDaylight;float wave=uPhase*aIndividual.w+aIndividual.x;
         float pick=fract(aIndividual.x*.731+aIndividual.z*.319);
         float pick2=fract(aIndividual.x*1.317+aIndividual.y*.719);
@@ -125,7 +126,7 @@ export async function createGarden(canvas) {
         float middleCover=exp(-pow((p.z+27.0)/23.0,2.0));
         gl_PointSize*=1.0+uDaylight*grass*middleCover*(.30-.38*aGrassTip);
         float sizeVariation=1.0+strength*(flow*(.15+pick*.85)+loosen*(pick2*.7+vBokeh*4.5));
-        gl_PointSize=min(gl_PointSize*sizeVariation,mix(22.0,38.0,vBokeh));
+        gl_PointSize=min(gl_PointSize*sizeVariation,mix(22.0,38.0,vBokeh))*uSize;
         vec3 N=normalize(mat3(modelMatrix)*aLightNormal);
         vec3 worldPosition=(modelMatrix*vec4(p,1.0)).xyz;
         shadowPosition=(uShadowMatrix*vec4(worldPosition,1.0)).xyz;
@@ -156,7 +157,7 @@ export async function createGarden(canvas) {
         }
       }`,
     fragmentShader:`#include <packing>
-      uniform float uDaylight;uniform sampler2D uShadowMap;varying vec3 shadowPosition;
+      uniform float uColorGain;uniform float uDaylight;uniform sampler2D uShadowMap;varying vec3 shadowPosition;
       uniform vec3 uFog;varying vec3 vColor;varying vec3 ambientColor;varying vec3 unlitColor;varying float vBokeh;varying float vPlantOpacity;varying float vDistance;
       void main(){vec2 uv=gl_PointCoord*2.0-1.0;float r=dot(uv,uv);if(r>1.0)discard;
         float alpha=min(1.0,exp(-r*1.5)*.95)*mix(1.0,.34,vBokeh);float fog=1.0-exp(-vDistance*vDistance*0.000025);
@@ -170,6 +171,7 @@ export async function createGarden(canvas) {
         }
         vec3 shaded=mix(unlitColor,mix(ambientColor,vColor,.35+.65*visibility),uDaylight);
         shaded*=mix(1.0,.78,vBokeh);
+        shaded*=vec3(1.0)+uColorGain*vec3(.35,.12,-.2);
         gl_FragColor=vec4(mix(shaded,uFog,fog),alpha);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
@@ -186,7 +188,7 @@ export async function createGarden(canvas) {
   air.setAttribute('position',new THREE.Float32BufferAttribute(airPositions,3));
   const airMaterial=new THREE.PointsMaterial({color:'#d8dfb2',size:.018,transparent:true,opacity:.4,depthWrite:false});
   const motes=new THREE.Points(air,airMaterial);scene.add(motes);
-  let yaw=0,pitch=0,distance=16.3,hoverX=0,hoverY=0,drag=null,targetYaw=0,targetPitch=0,phase=0,disposed=false,lastMotionTime=performance.now()/1000,lastMotionRate=1;
+  let yaw=0,pitch=0,distance=16.3,hoverX=0,hoverY=0,drag=null,targetYaw=0,targetPitch=0,phase=0,disposed=false,lastMotionTime=performance.now()/1000,lastMotionRate=1,rotationPhase=0;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   let frameSamples=0,frameTotal=0;
   function reset(){targetYaw=0;targetPitch=0;distance=16.3;hoverX=hoverY=0;}
@@ -227,21 +229,27 @@ export async function createGarden(canvas) {
     });
   }
   window.gardenMotionDebug=()=>({enabled:debugOn,clock:phase,samples:debugData});
-  function render(dt,features,motion=.8){
+  function render(dt,features,motion=.8,controls={}){
     if(disposed)return;
     updateLighting();
     frameTotal+=dt;frameSamples++;
     if(frameSamples===180){if(frameTotal/frameSamples>.04&&renderer.getPixelRatio()>.85){renderer.setPixelRatio(Math.max(.85,renderer.getPixelRatio()-.15));resize();}frameSamples=0;frameTotal=0;}
     const smoothing=1-Math.exp(-dt*4);yaw+=((targetYaw+hoverX)-yaw)*smoothing;pitch+=((targetPitch+hoverY)-pitch)*smoothing;
-    camera.position.set(Math.sin(yaw)*distance,1.72+Math.sin(pitch)*distance,-10+Math.cos(yaw)*distance);
+    rotationPhase+=dt*(controls.rotation||0)*.15;
+    const viewYaw=yaw+Math.sin(rotationPhase)*.15*Math.min(1,controls.rotation||0),viewDistance=Math.max(8,Math.min(24,distance/(controls.zoom??1)));
+    camera.position.set(Math.sin(viewYaw)*viewDistance,1.72+Math.sin(pitch)*viewDistance,-10+Math.cos(viewYaw)*viewDistance);
     camera.lookAt(0,1.72,-10);
     uniforms.uFlowFast.value=features.flowFast||0;uniforms.uFlowSlow.value=features.flowSlow||0;
     uniforms.uBurstFast.value=features.burstFast||0;uniforms.uBurstSlow.value=features.burstSlow||0;uniforms.uDriveSlow.value=features.driveSlow||0;
     uniforms.uFlow.value=features.flow||0;uniforms.uBurst.value=features.burst||0;uniforms.uDrive.value=features.drive||0;
-    const motionNow=performance.now()/1000,motionRate=features.oscillatorRate||1;
+    const motionNow=performance.now()/1000,motionRate=(features.oscillatorRate||1)*(controls.animationSpeed??1);
     phase+=(motionNow-lastMotionTime)*(lastMotionRate+motionRate)*.5;lastMotionTime=motionNow;lastMotionRate=motionRate;
-    uniforms.uAmplitude.value=features.motionAmplitude||0;uniforms.uRelease.value=features.structuralRelease||0;
-    uniforms.uLow.value=features.low||0;uniforms.uMid.value=features.mid||0;uniforms.uHigh.value=features.high||0;uniforms.uPhase.value=phase;uniforms.uEnergy.value=features.energy;uniforms.uPulse.value=features.pulse;uniforms.uMotion.value=motion*(reduced?.3:1);
+    uniforms.uAmplitude.value=(features.motionAmplitude||0)*Math.max(0,1+((controls.beatPulse??1)-1)*(features.pulse||0)*.35);uniforms.uRelease.value=(features.structuralRelease||0)*(controls.looseness??1);
+    uniforms.uSize.value=controls.particleSize??1;uniforms.uColorGain.value=((controls.color??1)-1)*(features.energy||0)*.5;
+    uniforms.uLow.value=features.low||0;uniforms.uMid.value=features.mid||0;uniforms.uHigh.value=features.high||0;uniforms.uPhase.value=phase;uniforms.uEnergy.value=features.energy;uniforms.uPulse.value=features.pulse;uniforms.uMotion.value=motion*(controls.distance??1)*(reduced?.3:1);
+    const extremeTarget=extremeControlMix(controls)*Math.min(1,(features.motionAmplitude||0)/.2);
+    uniforms.uExtreme.value+=(extremeTarget-uniforms.uExtreme.value)*(1-Math.exp(-dt*2.5));
+    if(extremeTarget===0&&uniforms.uExtreme.value<1e-5)uniforms.uExtreme.value=0;
     updateDebug(features);
     motes.position.y=Math.sin(phase*.07)*.07;airMaterial.opacity=.28+features.energy*.2;
     renderer.setRenderTarget(bloomTarget);renderer.render(scene,camera);renderer.setRenderTarget(null);renderer.render(bloomScene,bloomCamera);
@@ -251,5 +259,5 @@ export async function createGarden(canvas) {
   function setTimeOfDay(mode){
     const daylight=mode==='dusk';uniforms.uDaylight.value=daylight?1:0;sky.visible=daylight;
   }
-  return {render,reset,setTimeOfDay,count:positions.length/3,motionInfo:()=>({flow:uniforms.uFlow.value,burst:uniforms.uBurst.value,drive:uniforms.uDrive.value,restPositionsImmutable:true,flowFast:uniforms.uFlowFast.value,flowSlow:uniforms.uFlowSlow.value,burstFast:uniforms.uBurstFast.value,burstSlow:uniforms.uBurstSlow.value,individualAttributes:true,trunkParticipates:true,clock:uniforms.uPhase.value}),getCamera:()=>camera.position.toArray(),dispose(){disposed=true;observer.disconnect();shadowTarget.dispose();shadowMaterial.dispose();sky.geometry.dispose();skyMaterial.dispose();bloomTarget.dispose();bloomMaterial.dispose();bloomQuad.geometry.dispose();geometry.dispose();material.dispose();glowMaterial.dispose();air.dispose();airMaterial.dispose();renderer.dispose();}};
+  return {render,reset,setTimeOfDay,count:positions.length/3,motionInfo:()=>({extremeMix:uniforms.uExtreme.value,particleSize:uniforms.uSize.value,motionScale:uniforms.uMotion.value,colorGain:uniforms.uColorGain.value,amplitude:uniforms.uAmplitude.value,localLooseness:uniforms.uRelease.value,flow:uniforms.uFlow.value,burst:uniforms.uBurst.value,drive:uniforms.uDrive.value,restPositionsImmutable:true,flowFast:uniforms.uFlowFast.value,flowSlow:uniforms.uFlowSlow.value,burstFast:uniforms.uBurstFast.value,burstSlow:uniforms.uBurstSlow.value,individualAttributes:true,trunkParticipates:true,clock:uniforms.uPhase.value}),getCamera:()=>camera.position.toArray(),dispose(){disposed=true;observer.disconnect();shadowTarget.dispose();shadowMaterial.dispose();sky.geometry.dispose();skyMaterial.dispose();bloomTarget.dispose();bloomMaterial.dispose();bloomQuad.geometry.dispose();geometry.dispose();material.dispose();glowMaterial.dispose();air.dispose();airMaterial.dispose();renderer.dispose();}};
 }
