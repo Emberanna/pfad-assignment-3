@@ -38,7 +38,7 @@
     </section>
 
     <section class="music-panel" aria-label="Music player">
-      <div class="panel-topline"><span><i id="statusDot"></i><span id="status">Meadow ready</span></span><span class="local-note"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 9V6a4 4 0 0 1 8 0v3M5 9h10v8H5z"/></svg>Played locally on your device</span></div>
+      <div class="panel-topline"><button id="backToMusic" class="music-return" aria-label="Return to bring your own music" title="Bring your own music" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m7-7-7 7 7 7"/></svg></button><span id="playerStatus"><i id="statusDot"></i><span id="status">Meadow ready</span></span><span class="local-note"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 9V6a4 4 0 0 1 8 0v3M5 9h10v8H5z"/></svg>Played locally on your device</span></div>
       <div id="dropzone" class="dropzone">
         <button id="chooseFile" class="file-chooser"><span class="upload-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m-4 4 4-4 4 4M4 15v5h16v-5"/></svg></span><span><strong>Bring your own music</strong><small>Drop an MP4 or click to browse <span>· MP3 / WAV / M4A also supported</span></small></span></button>
         <button id="demoButton" class="demo-button">Try the demo <span aria-hidden="true">↗</span></button>

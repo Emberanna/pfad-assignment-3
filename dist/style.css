@@ -18,3 +18,15 @@
 .music-panel .file-chooser small,.music-panel .panel-topline,.music-panel .audio-readings,.music-panel .local-note{color:#d0d9c7}
 .music-panel .demo-button,.music-panel .play-button{background:rgba(28,40,31,.45);border-color:rgba(226,236,209,.32);color:#f0f1de}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.music-panel{background:rgba(25,38,29,.94)}}
+
+/* Clear rounded glass player, shared by upload and playback states. */
+.music-panel{border-radius:24px;background:linear-gradient(120deg,rgba(27,38,33,.26),rgba(24,30,28,.32));backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);border-color:rgba(235,239,220,.32)}
+.track-head{flex-wrap:wrap;justify-content:flex-start;column-gap:14px;row-gap:6px}#trackName{flex:1;min-width:70px}#backToMusic{color:#eef0dd}.music-panel .demo-button{border-radius:12px}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.music-panel{background:rgba(25,34,29,.58)}}
+
+
+/* Transparent circular return action replaces status in loaded-track mode. */
+.music-return{display:inline-grid;place-items:center;width:36px;height:36px;flex:none;padding:8px;border:1px solid rgba(232,241,213,.6);border-radius:50%;background:transparent;color:#f1f3df}.music-return svg{width:19px;height:19px}.music-return:hover{background:rgba(235,242,211,.10);border-color:#f1f3df}.scene-tools{bottom:270px}@media(max-width:700px){.scene-tools{bottom:266px}}
+
+/* Compact unframed return arrow; preserve the original player dimensions. */
+.music-panel{width:min(800px,calc(100% - 88px));padding:18px 25px 12px}.music-return{width:20px;height:14px;min-height:0;padding:0;border:0;border-radius:0;background:transparent}.music-return svg{width:16px;height:16px}.music-return:hover{background:transparent;color:#fff}.panel-topline{min-height:14px}.scene-tools{bottom:244px}@media(max-width:700px){.music-panel{width:calc(100% - 36px);padding:15px 17px 12px}.scene-tools{bottom:237px}}@media(min-width:1600px){.scene-tools{bottom:260px}}@media(max-height:650px) and (min-width:701px){.scene-tools{bottom:227px}}

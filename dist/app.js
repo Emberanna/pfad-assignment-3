@@ -21,7 +21,7 @@ function choose(){fileInput.value='';fileInput.click();}
 async function loadTrack(url,name,isDemo=false){
   const id=++loadId;media.pause();loading=true;playing=false;currentFile=name;resetAnalysis();
   if(objectURL&&objectURL!==url){URL.revokeObjectURL(objectURL);objectURL=null;}
-  $('trackArea').hidden=false;$('dropzone').hidden=true;$('trackName').textContent=name;$('trackName').title=name;$('playButton').disabled=true;$('seek').disabled=true;$('restart').disabled=true;$('currentTime').textContent='00:00';$('duration').textContent='00:00';$('seek').value=0;message();status('Loading your track…');syncPlay();status('Loading your track…');
+  $('trackArea').hidden=false;$('dropzone').hidden=true;$('backToMusic').hidden=false;$('playerStatus').hidden=true;$('trackName').textContent=name;$('trackName').title=name;$('playButton').disabled=true;$('seek').disabled=true;$('restart').disabled=true;$('currentTime').textContent='00:00';$('duration').textContent='00:00';$('seek').value=0;message();status('Loading your track…');syncPlay();status('Loading your track…');
   media.src=url;media.load();
   try{
     await new Promise((resolve,reject)=>{const timeout=setTimeout(()=>finish(new Error('Loading is taking too long. Choose the file again or try a shorter MP4 or MP3.')),20000);const ready=()=>finish(),failed=()=>finish(new Error('This file could not be played. Check that your MP4 contains audio, or try an AAC MP4, MP3, or WAV.'));function finish(error){clearTimeout(timeout);media.removeEventListener('loadedmetadata',ready);media.removeEventListener('error',failed);error?reject(error):resolve();}media.addEventListener('loadedmetadata',ready,{once:true});media.addEventListener('error',failed,{once:true});});
@@ -45,6 +45,15 @@ async function togglePlay(){
   finally{$('playButton').disabled=false;syncPlay();}
 }
 $('chooseFile').addEventListener('click',choose);$('replaceFile').addEventListener('click',choose);fileInput.addEventListener('change',()=>loadFile(fileInput.files[0]));
+$('backToMusic').addEventListener('click',()=>{
+ ++loadId;media.pause();currentFile=null;loading=false;playing=false;
+ media.removeAttribute('src');media.load();if(objectURL){URL.revokeObjectURL(objectURL);objectURL=null;}
+ resetAnalysis();fileInput.value='';$('trackArea').hidden=true;$('dropzone').hidden=false;$('backToMusic').hidden=true;$('playerStatus').hidden=false;
+ $('trackName').textContent='No track selected';$('trackName').title='';$('seek').value=0;
+ $('currentTime').textContent='00:00';$('duration').textContent='00:00';
+ for(const id of ['playButton','seek','restart'])$(id).disabled=true;
+ message();syncPlay();$('chooseFile').focus();
+});
 $('playButton').addEventListener('click',togglePlay);
 $('demoButton').addEventListener('click',async()=>{await loadTrack('./assets/ballade-4-excerpt.mp4','叙事曲4部分.mp4',true);});
 $('restart').addEventListener('click',()=>{media.currentTime=0;resetAnalysis();$('seek').value=0;$('currentTime').textContent='00:00';});

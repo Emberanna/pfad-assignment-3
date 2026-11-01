@@ -11,9 +11,15 @@ This revision focuses on three connected problems: grass density and volume, con
 - **Lighting choice:** Night retains the dark purple background and luminous point-cloud style. Dusk uses a low-angle warm directional light, environment fill, approximate particle normals, and a muted warm sky. After visual review, a stronger yellow-green treatment was rejected in favor of softer gray-gold transitions. Tree and grass shadows use a static point-cloud depth map.
 - **Player surface:** frosted glass softly reveals a little of the particle background while keeping labels and controls readable.
 
-![Dusk mode and frosted-glass music player](docs/screenshot.png)
+![Current Dusk scene and music player with the top-left return arrow](docs/screenshot.png)
 
 [Night mode](docs/night.png) · [Terrain before](docs/terrain-before.png) · [Terrain after, same camera](docs/terrain-after.png)
+
+## Player return control update
+
+Building on the existing player, a small, unframed arrow now appears in its top-left corner after loading the demo or a personal track, replacing the status text in that position. Selecting it stops playback and returns to **Bring your own music**, where another local recording can be selected. The panel keeps its original width, with a more transparent background and clearer rounded corners. The existing scene, lighting modes, camera controls and playback controls are retained.
+
+The screenshot above shows the current saved interface. See also the [current mobile player](docs/mobile.png). The recent experimental stronger breakup and near-camera particle changes were reverted; this saved version retains the preceding particle behavior.
 
 ## Run in VS Code
 
@@ -84,10 +90,10 @@ Earlier feedback praised the visual aesthetics and immersive atmosphere, but des
 
 **Feedback after the latest revision**
 
-After trying the updated experience, users reported a clear improvement in the particle effects compared with the previous version. Two areas still need attention:
+After trying the updated experience, users reported a clear improvement in the particle effects compared with the previous version. They identified the following areas for improvement:
 
 - **Clearer visual contrast between musical examples:** the differences between examples could be more visually pronounced, making changes in musical pace and intensity easier to see.
-- **Returning from the demo to personal music:** users reported that after choosing the demo, they could not return to playing their own preferred songs. Although changing the track is part of the intended workflow, this transition needs investigation and improvement. This remains an unresolved usability issue, rather than a completed fix.
+- **Returning from the demo to personal music:** users reported that after choosing the demo, they could not return to playing their own preferred songs. In response, the top-left return arrow was added. It now stops the current track and restores the music picker. Browser checks confirmed that a personal recording can be loaded and played after returning from the demo; further user feedback on the revised control is still welcome.
 
 This feedback reflects the creator's summary of user trials, rather than validation of every musical style or playback path.
 
