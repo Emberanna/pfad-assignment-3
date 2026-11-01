@@ -8,6 +8,6 @@
   },
   "scripts": {
     "start": "node server.mjs",
-    "check": "node --check dist/app.js && node --check dist/scene.js && node --check dist/particle-meadow.js && node --check dist/rhythm-worklet.js && node --test tests/audio-features.test.mjs"
+    "check": "node --check dist/app.js && node --check dist/scene.js && node --check dist/particle-meadow.js && node --check dist/rhythm-worklet.js && node --check dist/expressive-motion.js && node --check dist/particle-motion.js && node --test tests/audio-features.test.mjs tests/expressive-motion.test.mjs"
   }
 }

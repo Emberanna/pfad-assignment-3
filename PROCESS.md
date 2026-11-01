@@ -60,10 +60,19 @@ Codex assisted with implementation, debugging, code checks, browser automation, 
 
 No participant quotes or test outcomes have been invented. Automated checks are implementation evidence, not user research.
 
-## Participant testing — still required
+## User feedback and design response
 
-Ask at least one other person to try the experience before explaining it. Observe discovery of upload, playback, camera movement and lighting modes, and whether the audio response makes sense. Record actual hesitation and actions, then document an improvement or a reason for retaining the design. No participant test has been performed for this revision.
+The creator supplied a summary of feedback from people who experienced the prototype. They appreciated its visual aesthetics and immersive atmosphere, but described particle movement as sometimes intermittent and found the difference between moderately slow and highly energetic music insufficiently clear. They requested separate controls for particle size, movement speed and movement distance.
+
+**Design response:** retain the positively received visual direction and prioritize continuous individual-particle motion, clearer differences in musical response, and independently adjustable motion parameters. The current individual-particle revision is documented in [INDIVIDUAL_MOTION.md](docs/INDIVIDUAL_MOTION.md). The reported concerns remain feedback to evaluate, rather than evidence that the latest revision has solved them. Separate size, speed and distance controls are future work; this documentation update does not implement them.
+
+**Trial record:** this is a creator-provided feedback summary, not an observation made by Codex. The summary does not specify the trial date, whether participants tried the experience before receiving an explanation, which actions they attempted unaided, or where they hesitated. Add those actual observations and the resulting improvement or reason for retaining the design before final submission. No participant identity is needed, and no missing observations have been invented.
 
 ## Saving and Git history
 
 This snapshot was prepared on 31 October 2026 for the creator's second upload from the existing VS Code clone. Current code and English documentation are saved locally. The assistant has not committed or pushed to the creator's GitHub repository. Site publication uses a separate hosting repository and does not update GitHub. The creator should review the Source Control diff, commit the update and push it to retain the first upload's history.
+
+
+## Individual-particle interaction revision — 1 November 2026
+
+Review showed that shared grass-chain seeds, broad spatial waves and a near-fixed trunk still looked like grouped movement. The revision kept all rest positions and colors, introduced independent vertex attributes, enabled trunk participation, and replaced timed burst holds/cooldowns with continuous damped audio envelopes. Fast/slow response banks give particles different return rates. GPU transform feedback checked actual production GLSL on grass, crown and trunk samples; a live recording included close-ups and pause recovery. Eleven automated tests and 26 browser checks passed. See [implementation and limitations](docs/INDIVIDUAL_MOTION.md). Separate user controls for size, speed and distance remain future work. No GitHub commit or push was made by the assistant.

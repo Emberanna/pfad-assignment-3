@@ -1,5 +1,6 @@
 import * as THREE from './assets/three.module.js';
 import {buildMeadow} from './particle-meadow.js';
+import {createIndividualAttributes,individualMotionGLSL} from './particle-motion.js';
 
 // The scene is generated in three dimensions, without photographs or scanned assets.
 export async function createGarden(canvas) {
@@ -41,23 +42,45 @@ export async function createGarden(canvas) {
     }`});
   const sky=new THREE.Mesh(new THREE.PlaneGeometry(2,2),skyMaterial);sky.frustumCulled=false;sky.renderOrder=-100;scene.add(sky);
   const camera=new THREE.PerspectiveCamera(53,1,.08,320);
-  const {positions,colors,sizes,mobility,seeds,terrainHeight}=await buildMeadow(innerWidth<650);
+  const {positions,colors,sizes,mobility,seeds,terrainHeight,motionWeights}=await buildMeadow(innerWidth<650);
   let moteSeed=913;const random=()=>{moteSeed=(Math.imul(moteSeed,1664525)+1013904223)|0;return(moteSeed>>>0)/4294967296;};
   const geometry=new THREE.BufferGeometry();
   geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
   geometry.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
   geometry.setAttribute('aSize',new THREE.Float32BufferAttribute(sizes,1));
   geometry.setAttribute('aMobility',new THREE.Float32BufferAttribute(mobility,1));
+  geometry.setAttribute('aIndividual',new THREE.BufferAttribute(createIndividualAttributes(sizes.length),4));
+  geometry.setAttribute('aMotionWeight',new THREE.Float32BufferAttribute(motionWeights,1));
   geometry.setAttribute('aSeed',new THREE.Float32BufferAttribute(seeds,1));
   // Static, approximate surface normals: terrain gradients for grass and radial
   // plant normals for the sampled tree. No per-frame CPU particle updates.
   const normals=new Float32Array(sizes.length*3),tips=new Float32Array(sizes.length),exposure=new Float32Array(sizes.length);
+  // Dusk-only offsets reuse complete blades; Night retains original geometry.
+  const duskOffsets=new Float32Array(sizes.length*3),relativeTips=new Float32Array(sizes.length);
+  const grassCount=mobility.findIndex(group=>group!==0),bladeStart=Math.floor(grassCount*.30);
+  let redistributed=0;
+  for(let first=bladeStart;first<grassCount;){
+    let end=first+1;while(end<grassCount&&seeds[end]===seeds[first])end++;
+    const bx=positions[first*3],bz=positions[first*3+2],base=positions[first*3+1];
+    const blend=THREE.MathUtils.smoothstep(-bz,28,70)*.82;
+    const hash=Math.abs(Math.sin(seeds[first]*13.71)*43758.5453)%1;
+    const nx=bx*(1-blend*.16),nz=bz+(-23-hash*17-bz)*blend;
+    const dy=terrainHeight(nx,nz)-terrainHeight(bx,bz);
+    const tall=Math.max(.01,positions[(end-1)*3+1]-base);
+    for(let i=first;i<end;i++){
+      const k=i*3;duskOffsets[k]=nx-bx;duskOffsets[k+1]=dy;duskOffsets[k+2]=nz-bz;
+      relativeTips[i]=Math.max(0,Math.min(1,(positions[k+1]-base)/tall));
+      if(blend>.05)redistributed++;
+    }
+    first=end;
+  }
+  geometry.setAttribute('aDuskOffset',new THREE.BufferAttribute(duskOffsets,3));
   const n=new THREE.Vector3();
   for(let i=0;i<sizes.length;i++){
-    const k=i*3,x=positions[k],y=positions[k+1],z=positions[k+2],ground=terrainHeight(x,z);
+    const k=i*3,x=positions[k]+duskOffsets[k],y=positions[k+1]+duskOffsets[k+1],z=positions[k+2]+duskOffsets[k+2],ground=terrainHeight(x,z);
     if(mobility[i]===0){
       n.set(-(terrainHeight(x+.1,z)-terrainHeight(x-.1,z))/.2,1,-(terrainHeight(x,z+.1)-terrainHeight(x,z-.1))/.2).normalize();
-      tips[i]=THREE.MathUtils.smoothstep(y-ground,.16,.85);
+      tips[i]=relativeTips[i];
     }else{n.set((x-5.3)*.14,(y-ground-3)*.09,(z+10)*.14).normalize();if(n.lengthSq()<.01)n.set(0,1,0);}
     n.toArray(normals,k);
     // Broad exposure transition, not a projected canopy shadow (Stage 3.3).
@@ -76,26 +99,33 @@ export async function createGarden(canvas) {
   shadowCamera.position.copy(shadowFocus).addScaledVector(sunVector,125);shadowCamera.lookAt(shadowFocus);shadowCamera.updateMatrixWorld(true);
   const shadowMatrix=new THREE.Matrix4().set(.5,0,0,.5,0,.5,0,.5,0,0,.5,.5,0,0,0,1).multiply(shadowCamera.projectionMatrix).multiply(shadowCamera.matrixWorldInverse);
   const shadowMaterial=new THREE.ShaderMaterial({
-    vertexShader:`attribute float aMobility;varying float vCaster;void main(){vCaster=1.0-step(2.5,aMobility);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);gl_PointSize=mix(1.4,2.2,step(.5,aMobility));}`,
+    vertexShader:`attribute vec3 aDuskOffset;attribute float aMobility;varying float vCaster;void main(){vCaster=1.0-step(2.5,aMobility);gl_Position=projectionMatrix*modelViewMatrix*vec4(position+aDuskOffset,1.0);gl_PointSize=mix(1.4,2.2,step(.5,aMobility));}`,
     fragmentShader:`#include <packing>
       varying float vCaster;void main(){if(vCaster<.5||length(gl_PointCoord-.5)>.5)discard;gl_FragColor=packDepthToRGBA(gl_FragCoord.z);}`});
   const shadowScene=new THREE.Scene();shadowScene.background=new THREE.Color(1,1,1);const casters=new THREE.Points(geometry,shadowMaterial);casters.frustumCulled=false;shadowScene.add(casters);
   renderer.setRenderTarget(shadowTarget);renderer.render(shadowScene,shadowCamera);renderer.setRenderTarget(null);
-  const uniforms={uDaylight:{value:1},uLow:{value:0},uMid:{value:0},uHigh:{value:0},uPhase:{value:0},uEnergy:{value:0},uScale:{value:800},uMotion:{value:.8},uPulse:{value:0},uFog:{value:new THREE.Color('#302732')},uShadowMap:{value:shadowTarget.texture},uShadowMatrix:{value:shadowMatrix},uSunDirection:{value:new THREE.Vector3()},uSunColor:{value:new THREE.Color()},uSkyColor:{value:new THREE.Color()},uGroundColor:{value:new THREE.Color()}};
+  const uniforms={uFlowFast:{value:0},uFlowSlow:{value:0},uBurstFast:{value:0},uBurstSlow:{value:0},uDriveSlow:{value:0},uFlow:{value:0},uBurst:{value:0},uDrive:{value:0},uDaylight:{value:1},uLow:{value:0},uMid:{value:0},uHigh:{value:0},uPhase:{value:0},uEnergy:{value:0},uScale:{value:800},uMotion:{value:.8},uPulse:{value:0},uFog:{value:new THREE.Color('#302732')},uShadowMap:{value:shadowTarget.texture},uShadowMatrix:{value:shadowMatrix},uSunDirection:{value:new THREE.Vector3()},uSunColor:{value:new THREE.Color()},uSkyColor:{value:new THREE.Color()},uGroundColor:{value:new THREE.Color()}};
   updateLighting();
   const material=new THREE.ShaderMaterial({
     uniforms,vertexColors:true,transparent:true,depthWrite:true,depthTest:true,
-    vertexShader:`attribute vec3 aLightNormal;attribute float aGrassTip,aExposure;
+    vertexShader:`attribute vec3 aDuskOffset;attribute vec3 aLightNormal;attribute float aGrassTip,aExposure;
       uniform float uDaylight;uniform vec3 uSunDirection,uSunColor,uSkyColor,uGroundColor;
       uniform mat4 uShadowMatrix;varying vec3 shadowPosition;
-      attribute float aSize;attribute float aMobility;attribute float aSeed;
-      uniform float uPhase,uEnergy,uScale,uMotion,uPulse,uLow,uMid,uHigh;varying vec3 vColor;varying vec3 ambientColor;varying vec3 unlitColor;varying float vPlantOpacity;varying float vDistance;
-      void main(){vec3 p=position;float wave=uPhase+aSeed;
+      attribute vec4 aIndividual;attribute float aMotionWeight;attribute float aSize;attribute float aMobility;attribute float aSeed;
+      uniform float uFlowFast,uFlowSlow,uBurstFast,uBurstSlow,uDriveSlow;uniform float uFlow,uBurst,uDrive;uniform float uPhase,uEnergy,uScale,uMotion,uPulse,uLow,uMid,uHigh;varying vec3 vColor;varying vec3 ambientColor;varying vec3 unlitColor;varying float vBokeh;varying float vPlantOpacity;varying float vDistance;
+      void main(){vec3 p=position+aDuskOffset*uDaylight;float wave=uPhase*aIndividual.w+aIndividual.x;
+        float pick=fract(aIndividual.x*.731+aIndividual.z*.319);
+        float pick2=fract(aIndividual.x*1.317+aIndividual.y*.719);
+        vBokeh=0.0;
         float grass=1.0-step(0.5,aMobility);float haze=step(2.5,aMobility);float sparkle=step(1.5,aMobility)*(1.0-haze);float amp=(grass*(0.008+uLow*0.10)+(1.0-grass)*(0.018+uMid*0.14))*uMotion*(1.0-haze);
-        p.x+=sin(wave+p.z*0.6)*amp;p.y+=cos(wave*0.83+p.x*0.8)*amp*0.7;p.z+=sin(wave*0.63+p.y)*amp*0.65;
+        ${individualMotionGLSL}
         vec4 mv=modelViewMatrix*vec4(p,1.0);vDistance=-mv.z;
         gl_Position=projectionMatrix*mv;
         gl_PointSize=clamp(aSize*uScale*(1.05+uEnergy*0.65)/max(0.1,-mv.z),mix(1.1,0.65,haze),mix(mix(8.0,22.0,step(0.5,aMobility)),2.0,haze));
+        float middleCover=exp(-pow((p.z+27.0)/23.0,2.0));
+        gl_PointSize*=1.0+uDaylight*grass*middleCover*(.30-.38*aGrassTip);
+        float sizeVariation=1.0+strength*(flow*(.15+pick*.85)+loosen*(pick2*.7+vBokeh*4.5));
+        gl_PointSize=min(gl_PointSize*sizeVariation,mix(22.0,38.0,vBokeh));
         vec3 N=normalize(mat3(modelMatrix)*aLightNormal);
         vec3 worldPosition=(modelMatrix*vec4(p,1.0)).xyz;
         shadowPosition=(uShadowMatrix*vec4(worldPosition,1.0)).xyz;
@@ -110,12 +140,26 @@ export async function createGarden(canvas) {
         vPlantOpacity=(1.0-grass)*(1.0-haze);
         ambientColor=color*mix(ambient,vec3(1.0),haze);
         vColor=color*lighting*(1.08+uEnergy*0.08+sparkle*uHigh*(0.4+0.4*sin(wave*3.0)));
+        if(grass>.5){
+          // Continuous world-space exposure on the left slope; no horizontal bands.
+          float leftSlope=exp(-pow((worldPosition.x+10.0)/18.0,2.0)-pow((worldPosition.z+27.0)/23.0,2.0));
+          float treeShelter=1.0-.72*exp(-pow((worldPosition.x-5.3)/7.0,2.0)-pow((worldPosition.z+10.0)/11.0,2.0));
+          float facing=.28+.72*max(dot(N,uSunDirection),0.0);
+          float sunlight=leftSlope*treeShelter*(.55+facing*.9);
+          float tip=smoothstep(.38,.96,aGrassTip);
+          vec3 rootColor=color*vec3(.48,.76,.52);
+          vec3 sunlit=color*(ambient*.82+uSunColor*sunlight*(.18+tip*1.9));
+          // Thin-blade transmission adds gold only at exposed tips.
+          sunlit+=vec3(.68,.36,.055)*tip*sunlight*(.3+.7*forward);
+          ambientColor=mix(rootColor,color*ambient*.85,tip*.55);
+          vColor=mix(rootColor,sunlit,smoothstep(.02,.85,aGrassTip))*(1.08+uEnergy*.08);
+        }
       }`,
     fragmentShader:`#include <packing>
       uniform float uDaylight;uniform sampler2D uShadowMap;varying vec3 shadowPosition;
-      uniform vec3 uFog;varying vec3 vColor;varying vec3 ambientColor;varying vec3 unlitColor;varying float vPlantOpacity;varying float vDistance;
+      uniform vec3 uFog;varying vec3 vColor;varying vec3 ambientColor;varying vec3 unlitColor;varying float vBokeh;varying float vPlantOpacity;varying float vDistance;
       void main(){vec2 uv=gl_PointCoord*2.0-1.0;float r=dot(uv,uv);if(r>1.0)discard;
-        float alpha=min(1.0,exp(-r*1.5)*.95);float fog=1.0-exp(-vDistance*vDistance*0.000025);
+        float alpha=min(1.0,exp(-r*1.5)*.95)*mix(1.0,.34,vBokeh);float fog=1.0-exp(-vDistance*vDistance*0.000025);
         float visibility=1.0;
         if(uDaylight>.5&&shadowPosition.x>0.0&&shadowPosition.x<1.0&&shadowPosition.y>0.0&&shadowPosition.y<1.0&&shadowPosition.z>0.0&&shadowPosition.z<1.0){
           visibility=0.0;
@@ -125,6 +169,7 @@ export async function createGarden(canvas) {
           }
         }
         vec3 shaded=mix(unlitColor,mix(ambientColor,vColor,.35+.65*visibility),uDaylight);
+        shaded*=mix(1.0,.78,vBokeh);
         gl_FragColor=vec4(mix(shaded,uFog,fog),alpha);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
@@ -160,7 +205,10 @@ export async function createGarden(canvas) {
     const smoothing=1-Math.exp(-dt*4);yaw+=((targetYaw+hoverX)-yaw)*smoothing;pitch+=((targetPitch+hoverY)-pitch)*smoothing;
     camera.position.set(Math.sin(yaw)*distance,1.72+Math.sin(pitch)*distance,-10+Math.cos(yaw)*distance);
     camera.lookAt(0,1.72,-10);
-    phase+=dt*(.19+features.speed*2.1)*(reduced?.35:1);
+    uniforms.uFlowFast.value=features.flowFast||0;uniforms.uFlowSlow.value=features.flowSlow||0;
+    uniforms.uBurstFast.value=features.burstFast||0;uniforms.uBurstSlow.value=features.burstSlow||0;uniforms.uDriveSlow.value=features.driveSlow||0;
+    uniforms.uFlow.value=features.flow||0;uniforms.uBurst.value=features.burst||0;uniforms.uDrive.value=features.drive||0;
+    phase+=dt*(.45+features.speed*.45)*(reduced?.35:1);
     uniforms.uLow.value=features.low||0;uniforms.uMid.value=features.mid||0;uniforms.uHigh.value=features.high||0;uniforms.uPhase.value=phase;uniforms.uEnergy.value=features.energy;uniforms.uPulse.value=features.pulse;uniforms.uMotion.value=motion*(reduced?.3:1);
     motes.position.y=Math.sin(phase*.07)*.07;airMaterial.opacity=.28+features.energy*.2;
     renderer.setRenderTarget(bloomTarget);renderer.render(scene,camera);renderer.setRenderTarget(null);renderer.render(bloomScene,bloomCamera);
@@ -170,5 +218,5 @@ export async function createGarden(canvas) {
   function setTimeOfDay(mode){
     const daylight=mode==='dusk';uniforms.uDaylight.value=daylight?1:0;sky.visible=daylight;
   }
-  return {render,reset,setTimeOfDay,count:positions.length/3,getCamera:()=>camera.position.toArray(),dispose(){disposed=true;observer.disconnect();shadowTarget.dispose();shadowMaterial.dispose();sky.geometry.dispose();skyMaterial.dispose();bloomTarget.dispose();bloomMaterial.dispose();bloomQuad.geometry.dispose();geometry.dispose();material.dispose();glowMaterial.dispose();air.dispose();airMaterial.dispose();renderer.dispose();}};
+  return {render,reset,setTimeOfDay,count:positions.length/3,motionInfo:()=>({flow:uniforms.uFlow.value,burst:uniforms.uBurst.value,drive:uniforms.uDrive.value,restPositionsImmutable:true,flowFast:uniforms.uFlowFast.value,flowSlow:uniforms.uFlowSlow.value,burstFast:uniforms.uBurstFast.value,burstSlow:uniforms.uBurstSlow.value,individualAttributes:true,trunkParticipates:true,clock:uniforms.uPhase.value}),getCamera:()=>camera.position.toArray(),dispose(){disposed=true;observer.disconnect();shadowTarget.dispose();shadowMaterial.dispose();sky.geometry.dispose();skyMaterial.dispose();bloomTarget.dispose();bloomMaterial.dispose();bloomQuad.geometry.dispose();geometry.dispose();material.dispose();glowMaterial.dispose();air.dispose();airMaterial.dispose();renderer.dispose();}};
 }

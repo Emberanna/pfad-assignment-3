@@ -1,0 +1,209 @@
+{
+  "checks": [
+    {
+      "name": "Local preview serves HTML",
+      "pass": true,
+      "details": 200
+    },
+    {
+      "name": "Reference excerpt drives real-time energy",
+      "pass": true,
+      "details": {
+        "motion": {
+          "flow": 0.5801379148429411,
+          "burst": 0.15392474360873257,
+          "drive": 0.780171628565358,
+          "restPositionsImmutable": true
+        },
+        "burstTriggers": 2,
+        "pointCount": 891746,
+        "camera": [
+          0,
+          1.72,
+          6.300000000000001
+        ],
+        "playing": true,
+        "loading": false,
+        "features": {
+          "energy": 0.18677105955327136,
+          "speed": 0.9997560222115671,
+          "pulse": 0.21524034317052035,
+          "ready": true,
+          "low": 0.43018373558962825,
+          "mid": 0.25847227026513403,
+          "high": 0.002130993935787137,
+          "flow": 0.5801379148429411,
+          "burst": 0.15392474360873257,
+          "drive": 0.780171628565358,
+          "novelty": 0.1829542916949423,
+          "level": "Flow",
+          "normalizedEnergy": 0.7731601752220495
+        },
+        "duration": 48,
+        "currentTime": 9.914921,
+        "contextState": "running",
+        "rhythmEngine": "audio-worklet"
+      }
+    },
+    {
+      "name": "Eleven-minute MP4 metadata loaded",
+      "pass": true,
+      "details": 660
+    },
+    {
+      "name": "Long MP4 plays and analyzes continuously at normal speed",
+      "pass": true,
+      "details": {
+        "motion": {
+          "flow": 0.26087291636881865,
+          "burst": 0.6098845747933438,
+          "drive": 0.5212924515523091,
+          "restPositionsImmutable": true
+        },
+        "burstTriggers": 1,
+        "pointCount": 891746,
+        "camera": [
+          0,
+          1.72,
+          6.300000000000001
+        ],
+        "playing": true,
+        "loading": false,
+        "features": {
+          "energy": 0.38195957525906504,
+          "speed": 0.425533894160665,
+          "pulse": 0.03293124639973606,
+          "ready": true,
+          "low": 0.0039656434684058085,
+          "mid": 0.15517731296272833,
+          "high": 0.00001852439021969564,
+          "flow": 0.26087291636881865,
+          "burst": 0.6098845747933438,
+          "drive": 0.5212924515523091,
+          "novelty": 0.027991559439775653,
+          "level": "Burst",
+          "normalizedEnergy": 0.2736452839083839
+        },
+        "duration": 660,
+        "currentTime": 20.010609,
+        "contextState": "running",
+        "rhythmEngine": "audio-worklet"
+      }
+    },
+    {
+      "name": "Long MP4 pause returns particles",
+      "pass": true,
+      "details": {
+        "flow": 0.0000015511376931381317,
+        "burst": 0.00007343678709101658,
+        "drive": 7.55811461537506e-9,
+        "restPositionsImmutable": true
+      }
+    },
+    {
+      "name": "Long MP4 resumes from previous position",
+      "pass": true
+    },
+    {
+      "name": "Eleven-minute MP4 reaches natural end and settles",
+      "pass": true,
+      "details": {
+        "motion": {
+          "flow": 7.605477757757867e-7,
+          "burst": 0.00003832656383943829,
+          "drive": 1.5600721306829314e-9,
+          "restPositionsImmutable": true
+        },
+        "burstTriggers": 14,
+        "pointCount": 891746,
+        "camera": [
+          0,
+          1.72,
+          6.300000000000001
+        ],
+        "playing": false,
+        "loading": false,
+        "features": {
+          "energy": 1.0926043261386265e-12,
+          "speed": 0.0000013733374761427268,
+          "pulse": 1.173091101281414e-24,
+          "ready": false,
+          "low": 7.875555506585043e-13,
+          "mid": 5.253856474986356e-13,
+          "high": 1.4579840383288704e-14,
+          "flow": 7.605477757757867e-7,
+          "burst": 0.00003832656383943829,
+          "drive": 1.5600721306829314e-9,
+          "novelty": 0,
+          "level": "Calm",
+          "normalizedEnergy": 0
+        },
+        "duration": 660,
+        "currentTime": 660,
+        "contextState": "running",
+        "rhythmEngine": "audio-worklet"
+      }
+    },
+    {
+      "name": "Replay after end restarts successfully",
+      "pass": true
+    },
+    {
+      "name": "No media or shader console errors",
+      "pass": true,
+      "details": []
+    }
+  ],
+  "errors": [],
+  "snapshots": [
+    {
+      "time": 102.050204,
+      "playing": true,
+      "flow": 0.602149372918362,
+      "burst": 0.6338510642200595
+    },
+    {
+      "time": 182.20397,
+      "playing": true,
+      "flow": 0.4455453601165283,
+      "burst": 0.0888819741969307
+    },
+    {
+      "time": 262.393384,
+      "playing": true,
+      "flow": 0.48297570700936715,
+      "burst": 0.31540774436640023
+    },
+    {
+      "time": 342.68648,
+      "playing": true,
+      "flow": 0.6133614844162226,
+      "burst": 0.12977413581906636
+    },
+    {
+      "time": 423.324713,
+      "playing": true,
+      "flow": 0.46542621639856774,
+      "burst": 0.49970221206511173
+    },
+    {
+      "time": 503.631821,
+      "playing": true,
+      "flow": 0.4554701572995872,
+      "burst": 0.08252738481303014
+    },
+    {
+      "time": 583.982376,
+      "playing": true,
+      "flow": 0.5806986134942015,
+      "burst": 0.40614214993873626
+    },
+    {
+      "time": 660,
+      "playing": false,
+      "flow": 0.3476959438531551,
+      "burst": 0.6738368030533188
+    }
+  ],
+  "method": "48-second reference excerpt; normal-speed long-MP4 start/pause/resume; 16x traversal to natural end; separate 20-minute bounded-state simulation"
+}

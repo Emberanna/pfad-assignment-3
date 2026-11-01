@@ -6,7 +6,7 @@ An interactive, audio-reactive 3D particle landscape for people who want to expl
 
 This revision focuses on three connected problems: grass density and volume, continuous slopes and depth, and the choice of lighting style. It keeps the landscape entirely particle-based.
 
-- **Grass density:** the dense foreground patch previously ended abruptly. Its distribution now fades continuously into the distance. Some existing ground points form curved, upward-growing grass chains with varied heights and lean; other points remain as ground cover. The desktop landscape budget remains **848,496 points**, rather than adding unlimited particles.
+- **Grass density:** the dense foreground patch previously ended abruptly. Its distribution now fades continuously into the distance. Some existing ground points form curved, upward-growing grass chains with varied heights and lean; other points remain as ground cover. The desktop landscape contains **891,746 points** after the accepted woodland reinforcement; the music-interaction upgrade adds no particles.
 - **Terrain and slopes:** one smooth height field creates broad rolling slopes and low hills. Grass roots, flowers, and trees use the same terrain height. Distant ground samples extend smoothly so a fixed boundary is less visible. Existing grass-cluster thickness is preserved; the camera and controls are retained.
 - **Lighting choice:** Night retains the dark purple background and luminous point-cloud style. Dusk uses a low-angle warm directional light, environment fill, approximate particle normals, and a muted warm sky. After visual review, a stronger yellow-green treatment was rejected in favor of softer gray-gold transitions. Tree and grass shadows use a static point-cloud depth map.
 - **Player surface:** frosted glass softly reveals a little of the particle background while keeping labels and controls readable.
@@ -40,7 +40,7 @@ Selected files remain local in the browser and are not uploaded or retained afte
 
 ## Audio response
 
-RMS energy affects point size; onset-based rhythmic activity affects movement speed. Low frequencies influence grass, mid frequencies influence vegetation, and high frequencies influence luminous accents. AudioWorklet tracks rhythm independently of rendering frame rate, with a spectral fallback. Lighting modes retain these mappings.
+Real-time RMS, spectral novelty, frequency bands and rhythmic activity drive continuous damped motion envelopes. Every landscape point has an independent phase, sensitivity, trajectory frequency and return parameter; grass chains, branches and trunks can separate and then reassemble around unchanged rest positions. Sparse large points create soft size contrast. AudioWorklet tracks rhythm independently of rendering frame rate, with a spectral fallback. Night/Dusk switching retains these mappings.
 
 ## Project files
 
@@ -57,11 +57,31 @@ RMS energy affects point size; onset-based rhythmic activity affects movement sp
 
 ## Validation and limits
 
-Run `npm run check` for syntax and four audio behavior tests. The latest real-browser run passed **23 checks**, including both lighting modes, playback continuity during switching, MP4 loading, drag-and-drop, camera controls and mobile layout. It reported no captured console errors. See [browser results](docs/browser-validation.json) and [PROCESS.md](PROCESS.md).
+Run `npm run check` for syntax and **11 audio/motion tests**. The latest real-browser run passed **26 checks**, covering lighting modes, live audio, independent return envelopes, MP4 loading, drag-and-drop, camera controls and mobile layout, with no captured console errors. See [browser results](docs/motion-browser-validation.json), [individual-particle implementation](docs/INDIVIDUAL_MOTION.md), and [PROCESS.md](PROCESS.md).
 
 The result is stylized point-cloud art, not a photograph or trained Gaussian-splat reconstruction. Tree lighting normals are approximate. The shadow map uses the vegetation's rest pose and does not follow every music-driven movement. Particle shadow softness and detail are limited by a 2048-pixel depth map. First-load asset size and GPU performance vary by device; smaller displays reduce samples and sustained low frame rates reduce pixel ratio. No universal frame-rate claim is made.
 
-Rhythm estimation can struggle with polyphony, legato and noise. MP4 needs a supported codec and an audio track. Participant usability testing has not yet been performed.
+Rhythm estimation can struggle with polyphony, legato and noise. MP4 needs a supported codec and an audio track. User feedback and planned improvements are summarized below; the available trial record and design response are documented in PROCESS.md.
+
+## User Feedback and Future Improvements
+
+After experiencing the prototype, users gave positive feedback on its visual aesthetics and immersive atmosphere. However, they also identified several areas for improvement.
+
+**Music-Responsive Particle Movement**
+
+- Particle movement sometimes feels intermittent rather than continuous and natural.
+- The visual responses to moderately slow music and highly energetic music are not sufficiently distinct.
+- The relationship between musical intensity and particle movement needs further refinement to create more expressive and responsive interactions.
+
+**Customisable Interaction Settings**
+
+Users also suggested adding more control over the visual experience, allowing them to adjust:
+
+- **Particle Size:** Change the size of individual particles.
+- **Movement Speed:** Control how quickly particles move and respond to music.
+- **Movement Distance:** Adjust how far particles travel from their original positions.
+
+These improvements could make the experience more responsive to different musical styles while giving users greater control over their personalised visual environment.
 
 ## Credits
 

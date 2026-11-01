@@ -1,7 +1,8 @@
 import {createGarden} from './scene.js';
 import {AudioFeatures} from './audio-features.js';
+import {ExpressiveMotion} from './expressive-motion.js';
 const $=id=>document.getElementById(id);
-const media=$('media'),fileInput=$('fileInput'),features=new AudioFeatures();
+const media=$('media'),fileInput=$('fileInput'),features=new AudioFeatures(),expressive=new ExpressiveMotion();
 let garden,audioContext,analyser,source,gainNode,wave,spectrum,objectURL,loadId=0,playing=false,loading=false,lastFrame=performance.now(),lastUI=0;
 let currentFile=null,noAudioSince=null,rhythmNode=null,rhythmData=null,lastAudioTime=null;
 const state={energy:0,speed:0,pulse:0,ready:false};
@@ -15,7 +16,7 @@ async function setupAudio(){
   }
   await audioContext.resume();
 }
-function resetAnalysis(){features.reset();noAudioSince=null;rhythmData=null;lastAudioTime=null;rhythmNode?.port.postMessage({type:'reset'});}
+function resetAnalysis(){features.reset();expressive.reset();noAudioSince=null;rhythmData=null;lastAudioTime=null;rhythmNode?.port.postMessage({type:'reset'});}
 function choose(){fileInput.value='';fileInput.click();}
 async function loadTrack(url,name,isDemo=false){
   const id=++loadId;media.pause();loading=true;playing=false;currentFile=name;resetAnalysis();
@@ -70,16 +71,20 @@ document.addEventListener('drop',e=>{e.preventDefault();dragDepth=0;$('dropOverl
 document.addEventListener('keydown',e=>{if(e.target instanceof HTMLInputElement||e.target instanceof HTMLButtonElement||$('helpDialog').open)return;if(e.code==='Space'){e.preventDefault();togglePlay();}if(e.key.toLowerCase()==='r')garden?.reset();});
 document.addEventListener('visibilitychange',()=>{lastFrame=performance.now();if(audioContext)resetAnalysis();});
 try{garden=await createGarden($('garden'));$('renderStatus').textContent='PARTICLE MEADOW · 3D LIVE';}catch(error){console.error(error);$('renderError').hidden=false;$('renderStatus').textContent='WEBGL UNAVAILABLE';}
+function frequencyBand(lo,hi){let sum=0,n=0;const hz=audioContext.sampleRate/analyser.fftSize;for(let i=Math.max(1,Math.ceil(lo/hz));i<Math.min(spectrum.length,Math.ceil(hi/hz));i++){sum+=spectrum[i]/255;n++;}return sum/Math.max(1,n);}
 function frame(now){
   const dt=Math.min(.06,Math.max(.001,(now-lastFrame)/1000));lastFrame=now;
   if(playing&&analyser&&audioContext.state==='running'&&!media.seeking){
     analyser.getFloatTimeDomainData(wave);analyser.getByteFrequencyData(spectrum);
-    const band=(lo,hi)=>{let sum=0,n=0;const hz=audioContext.sampleRate/analyser.fftSize;for(let i=Math.max(1,Math.ceil(lo/hz));i<Math.min(spectrum.length,Math.ceil(hi/hz));i++){sum+=spectrum[i]/255;n++;}return sum/Math.max(1,n);};
-    for(const [key,lo,hi] of [['low',35,250],['mid',250,2200],['high',2200,12000]])state[key]=(state[key]||0)+(band(lo,hi)-(state[key]||0))*(1-Math.exp(-dt*7));
+    const bandSmoothing=1-Math.exp(-dt*7);
+    state.low=(state.low||0)+(frequencyBand(35,250)-(state.low||0))*bandSmoothing;
+    state.mid=(state.mid||0)+(frequencyBand(250,2200)-(state.mid||0))*bandSmoothing;
+    state.high=(state.high||0)+(frequencyBand(2200,12000)-(state.high||0))*bandSmoothing;
     const audioDt=lastAudioTime===null?dt:Math.min(.5,Math.max(.001,audioContext.currentTime-lastAudioTime));lastAudioTime=audioContext.currentTime;
     Object.assign(state,features.update(wave,spectrum,audioContext.currentTime,audioDt,Number($('sensitivity').value),rhythmData));
     if(state.energy<.012){noAudioSince??=audioContext.currentTime;if(audioContext.currentTime-noAudioSince>7)message('No sound detected: this may be a silent passage or an MP4 without a usable audio track. Try another file.');}else{if(noAudioSince&&$('message').textContent.startsWith('No sound detected'))message();noAudioSince=null;}
   }else {Object.assign(state,features.idle(dt));for(const key of ['low','mid','high'])state[key]=(state[key]||0)*Math.exp(-dt*4);}
+  Object.assign(state,expressive.update(wave,spectrum,dt,state,!!(playing&&analyser&&audioContext?.state==='running'&&!media.seeking)));
   garden?.render(dt,state,Number($('motion').value));
   if(now-lastUI>120){
     lastUI=now;$('energyMeter').style.transform=`scaleX(${state.energy.toFixed(3)})`;
@@ -91,7 +96,7 @@ function frame(now){
 }
 requestAnimationFrame(frame);
 // Read-only diagnostics for browser validation; no files, identities or audio leave the browser.
-window.gardenDiagnostics=()=>({pointCount:garden?.count,sceneInfo:garden?.info?.(),camera:garden?.getCamera(),playing,loading,features:{...state},duration:media.duration,currentTime:media.currentTime,contextState:audioContext?.state,rhythmEngine:rhythmNode?'audio-worklet':'spectral-fallback'});
+window.gardenDiagnostics=()=>({motion: garden?.motionInfo?.(),burstTriggers:expressive.triggerCount,pointCount:garden?.count,sceneInfo:garden?.info?.(),camera:garden?.getCamera(),playing,loading,features:{...state},duration:media.duration,currentTime:media.currentTime,contextState:audioContext?.state,rhythmEngine:rhythmNode?'audio-worklet':'spectral-fallback'});
 
 // Lighting changes do not replace the scene or interrupt local audio playback.
 for(const [id,mode] of [['nightMode','night'],['duskMode','dusk']]){

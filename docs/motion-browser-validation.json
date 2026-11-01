@@ -1,0 +1,214 @@
+{
+  "checks": [
+    {
+      "name": "Local preview serves HTML",
+      "pass": true,
+      "details": 200
+    },
+    {
+      "name": "3D particle meadow initialized",
+      "pass": true,
+      "details": 891746
+    },
+    {
+      "name": "No WebGL failure overlay",
+      "pass": true
+    },
+    {
+      "name": "Night mode selected",
+      "pass": true
+    },
+    {
+      "name": "Dusk mode selected",
+      "pass": true
+    },
+    {
+      "name": "Dragging changes 3D camera",
+      "pass": true,
+      "details": {
+        "before": [
+          0,
+          1.72,
+          6.300000000000001
+        ],
+        "after": [
+          -4.212379598674153,
+          2.1285467066495896,
+          5.746296647677948
+        ]
+      }
+    },
+    {
+      "name": "Demo metadata loaded",
+      "pass": true
+    },
+    {
+      "name": "Real audio drives particle energy",
+      "pass": true,
+      "details": {
+        "motion": {
+          "flow": 0.15450571379007472,
+          "burst": 0.015376584719430507,
+          "drive": 0.5254529400328155,
+          "restPositionsImmutable": true,
+          "flowFast": 0.1687197299661048,
+          "flowSlow": 0.1721200811573117,
+          "burstFast": 0.01706198071605514,
+          "burstSlow": 0.016096060151311445,
+          "individualAttributes": true,
+          "trunkParticipates": true,
+          "clock": 14.025902704643878
+        },
+        "burstTriggers": 10,
+        "pointCount": 891746,
+        "camera": [
+          -6.82476836502332e-19,
+          1.72,
+          6.300000000000001
+        ],
+        "playing": true,
+        "loading": false,
+        "features": {
+          "energy": 0.3478148899439185,
+          "speed": 0.21759975774214446,
+          "pulse": 0.3297787403008392,
+          "ready": true,
+          "low": 0.02790431478371227,
+          "mid": 0.12358005143943458,
+          "high": 2.005465392169897e-10,
+          "flow": 0.15450571379007472,
+          "burst": 0.015376584719430507,
+          "drive": 0.5254529400328155,
+          "novelty": 0.2803119292557133,
+          "level": "Calm",
+          "normalizedEnergy": 0.6172278931664616,
+          "flowFast": 0.1687197299661048,
+          "flowSlow": 0.1721200811573117,
+          "burstFast": 0.01706198071605514,
+          "burstSlow": 0.016096060151311445,
+          "driveSlow": 0.47462085346071997
+        },
+        "duration": 48,
+        "currentTime": 12.985361,
+        "contextState": "running",
+        "rhythmEngine": "audio-worklet"
+      }
+    },
+    {
+      "name": "3D scene remains available during playback",
+      "pass": true
+    },
+    {
+      "name": "Playback remains active during frame sample",
+      "pass": true
+    },
+    {
+      "name": "Mode switch retains playing audio",
+      "pass": true
+    },
+    {
+      "name": "Mode switch retains playback progress",
+      "pass": true
+    },
+    {
+      "name": "Real fast passage increases estimated rhythmic activity",
+      "pass": true,
+      "details": {
+        "slow": {
+          "energy": 0.3478148899439185,
+          "speed": 0.21759975774214446,
+          "pulse": 0.3297787403008392,
+          "ready": true,
+          "low": 0.02790431478371227,
+          "mid": 0.12358005143943458,
+          "high": 2.005465392169897e-10,
+          "flow": 0.15450571379007472,
+          "burst": 0.015376584719430507,
+          "drive": 0.5254529400328155,
+          "novelty": 0.2803119292557133,
+          "level": "Calm",
+          "normalizedEnergy": 0.6172278931664616,
+          "flowFast": 0.1687197299661048,
+          "flowSlow": 0.1721200811573117,
+          "burstFast": 0.01706198071605514,
+          "burstSlow": 0.016096060151311445,
+          "driveSlow": 0.47462085346071997
+        },
+        "fast": {
+          "energy": 0.3725958392918338,
+          "speed": 0.8265170116830435,
+          "pulse": 0.0709816892326905,
+          "ready": true,
+          "low": 0.36166751255187857,
+          "mid": 0.18178594625879127,
+          "high": 0.000006235208833713877,
+          "flow": 0.7409854799012505,
+          "burst": 0.6492877078085357,
+          "drive": 0.5123187445155305,
+          "novelty": 1,
+          "level": "Burst",
+          "normalizedEnergy": 0.2975950020191005,
+          "flowFast": 0.7688124437174374,
+          "flowSlow": 0.789507878189851,
+          "burstFast": 0.6766514310553835,
+          "burstSlow": 0.6919204715518789,
+          "driveSlow": 0.6634047295151515
+        }
+      }
+    },
+    {
+      "name": "Independent slow return settles",
+      "pass": true
+    },
+    {
+      "name": "Pause settles expressive motion",
+      "pass": true
+    },
+    {
+      "name": "Pause settles audio response",
+      "pass": true
+    },
+    {
+      "name": "Settings open",
+      "pass": true
+    },
+    {
+      "name": "Guide opens",
+      "pass": true
+    },
+    {
+      "name": "Local MP4 file selection works",
+      "pass": true
+    },
+    {
+      "name": "MP4 audio enters analysis",
+      "pass": true
+    },
+    {
+      "name": "Invalid drop gets useful feedback",
+      "pass": true
+    },
+    {
+      "name": "Valid drag-and-drop loads local audio",
+      "pass": true
+    },
+    {
+      "name": "Mobile page has no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "Mobile player fits viewport",
+      "pass": true
+    },
+    {
+      "name": "3D scene remains available after resizing",
+      "pass": true
+    },
+    {
+      "name": "No uncaught browser exceptions",
+      "pass": true,
+      "details": []
+    }
+  ],
+  "errors": []
+}

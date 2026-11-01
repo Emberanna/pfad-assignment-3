@@ -2,7 +2,7 @@ import * as THREE from './assets/three.module.js';
 import {GLTFLoader} from './assets/GLTFLoader.js';
 export async function buildMeadow(mobile=false){
   let seed=19871;const rnd=()=>{seed=(Math.imul(seed,1664525)+1013904223)|0;return(seed>>>0)/4294967296;};
-  const positions=[],colors=[],sizes=[],mobility=[],seeds=[],color=new THREE.Color();
+  const motionWeights=[],positions=[],colors=[],sizes=[],mobility=[],seeds=[],color=new THREE.Color();
   const density=mobile?.55:1;
   // One smooth height field anchors ground cover, blade roots, flowers and trees.
   const height=(x,z)=>{
@@ -13,7 +13,7 @@ export async function buildMeadow(mobile=false){
       -hill(-4,-25,24,25,.35)+hill(-9,-102,51,42,4.6)
       +far*(.8+1.15*Math.sin(x*.028+z*.014));
   };
-  function put(x,y,z,c,size,group){if(rnd()>density)return;positions.push(x,y,z);colors.push(c.r,c.g,c.b);sizes.push(size*(.7+rnd()*.6));mobility.push(group);seeds.push(rnd()*100);}
+  function put(x,y,z,c,size,group,weight=group===3?0:1){if(rnd()>density)return;positions.push(x,y,z);colors.push(c.r,c.g,c.b);sizes.push(size*(.7+rnd()*.6));mobility.push(group);motionWeights.push(weight);seeds.push(rnd()*100);}
   // Smaller, flat samples preserve the accepted yellow-green meadow palette.
   function grassColor(){const choice=rnd();if(choice<.13)color.setHSL(.145+rnd()*.035,.48,.43+rnd()*.1);else if(choice<.29)color.setHSL(.29+rnd()*.055,.38,.22+rnd()*.1);else color.setHSL(.19+rnd()*.045,.36+rnd()*.12,.40+rnd()*.12);}
   for(let i=0;i<165000;i++){const z=8-rnd()*115,x=(rnd()-.5)*130;grassColor();put(x,height(x,z)+(rnd()-.5)*.035,z,color,.023+rnd()*.012,0);}
@@ -55,20 +55,22 @@ export async function buildMeadow(mobile=false){
       let u=rnd(),v=rnd();if(u+v>1){u=1-u;v=1-v;}const q=1-u-v;
       p.set(pa.getX(a)*q+pa.getX(b)*u+pa.getX(c)*v,pa.getY(a)*q+pa.getY(b)*u+pa.getY(c)*v,pa.getZ(a)*q+pa.getZ(b)*u+pa.getZ(c)*v).applyMatrix4(mesh.matrixWorld);
       if(data&&uv){const tx=uv.getX(a)*q+uv.getX(b)*u+uv.getX(c)*v,ty=uv.getY(a)*q+uv.getY(b)*u+uv.getY(c)*v;const ix=((Math.floor(tx*w)%w)+w)%w,iy=((Math.floor(ty*h)%h)+h)%h,index=(iy*w+ix)*4;if(data[index+3]<100)continue;color.setRGB(data[index]/255,data[index+1]/255,data[index+2]/255,THREE.SRGBColorSpace);color.multiplyScalar(foliage?2.2:1.5);color.r=Math.max(color.r,.035);color.g=Math.max(color.g,.045);color.b=Math.max(color.b,.025);}else color.set(foliage?'#abc777':'#c2ae87');
-      put(p.x,p.y,p.z,color,foliage?.033:.024,1);
-      if(!foliage&&p.y<baseY+1.45){const c=color.clone().multiplyScalar(1.3);put(p.x+(rnd()-.5)*.012,p.y,p.z+(rnd()-.5)*.012,c,.026,1);if(p.y<baseY+.45)baseSamples.push(p.clone());}
+      put(p.x,p.y,p.z,color,foliage?.033:.024,1,foliage?.9:.025);
+      if(!foliage&&p.y<baseY+1.45){const c=color.clone().multiplyScalar(1.3);put(p.x+(rnd()-.5)*.012,p.y,p.z+(rnd()-.5)*.012,c,.026,1,.025);if(p.y<baseY+.45)baseSamples.push(p.clone());}
     }
   });
   // Root fans start at the sampled trunk foot and disappear into the same terrain surface.
   if(baseSamples.length){const foot=new THREE.Vector3();for(const sample of baseSamples)foot.add(sample);foot.multiplyScalar(1/baseSamples.length);
     for(let arm=0;arm<9;arm++){const angle=arm/9*Math.PI*2+rnd()*.25,length=.6+rnd()*1.25;
-      for(let j=0;j<650;j++){const t=rnd(),a=rnd()*Math.PI*2,r=(1-t)*(.045+rnd()*.045),x=foot.x+Math.cos(angle)*length*t,z=foot.z+Math.sin(angle)*length*t;const y=height(x,z)+(1-t)*.14-.025*t+Math.sin(a)*r;color.set('#b4a17d');color.multiplyScalar(.65+rnd()*.45);put(x+Math.cos(a)*r,y,z,color,.022,1);}
+      for(let j=0;j<650;j++){const t=rnd(),a=rnd()*Math.PI*2,r=(1-t)*(.045+rnd()*.045),x=foot.x+Math.cos(angle)*length*t,z=foot.z+Math.sin(angle)*length*t;const y=height(x,z)+(1-t)*.14-.025*t+Math.sin(a)*r;color.set('#b4a17d');color.multiplyScalar(.65+rnd()*.45);put(x+Math.cos(a)*r,y,z,color,.022,1,.025);}
     }
   }
+  const woodlandAnchors=[];
   for(let i=0;i<65;i++){
     const x=(rnd()-.5)*160,z=-45-rnd()*90,base=height(x,z),treeHeight=3+rnd()*7;
+    woodlandAnchors.push({x,z,base,h:treeHeight});
     for(let j=0;j<2400;j++){const a=rnd()*6.283,v=rnd()*2-1,r=Math.cbrt(rnd()),ring=Math.sqrt(1-v*v);color.setHSL(.22+rnd()*.07,.3,.37+rnd()*.17);put(x+Math.cos(a)*ring*r*4,base+treeHeight*.65+v*r*treeHeight*.45,z+Math.sin(a)*ring*r*3,color,.055,1);}
-    for(let j=0;j<230;j++){const t=rnd(),a=rnd()*Math.PI*2;color.set('#b9ac8b');color.multiplyScalar(.7+rnd()*.3);put(x+Math.cos(a)*.13,base+t*treeHeight*.65,z+Math.sin(a)*.13,color,.039,1);}
+    for(let j=0;j<230;j++){const t=rnd(),a=rnd()*Math.PI*2;color.set('#b9ac8b');color.multiplyScalar(.7+rnd()*.3);put(x+Math.cos(a)*.13,base+t*treeHeight*.65,z+Math.sin(a)*.13,color,.039,1,.08);}
   }
   // Small, static pale-gold points form a horizon veil that thins into the dark upper sky.
   for(let i=0;i<85000;i++){
@@ -112,5 +114,41 @@ export async function buildMeadow(mobile=false){
     }
   }
   formGrassClusters();
-  return{positions,colors,sizes,mobility,seeds,terrainHeight:height};
+
+  // Warm woodland reinforcement. Existing points, palette and shader are untouched.
+  function densifyWoodland(){
+    let state=887431;const random=()=>{state=(Math.imul(state,1664525)+1013904223)|0;return(state>>>0)/4294967296;};
+    function crown(cx,cz,base,h,width,depth,count,phase){
+      for(let j=0;j<count;j++){
+        const a=random()*Math.PI*2,v=random()*2-1,r=Math.pow(random(),.48),ring=Math.sqrt(1-v*v);
+        const lobe=1+.13*Math.sin(a*3+phase)+.09*Math.cos(a*5-phase);
+        const dx=Math.cos(a)*ring*r*width*lobe,dz=Math.sin(a)*ring*r*depth*lobe;
+        const y=base+h*.65+v*r*h*.43+Math.sin(dx*.7+phase)*h*.035;
+        // Low-angle light catches upper/left samples; the interior stays olive green.
+        const light=Math.max(0,(-dx/width-dz/depth+v*.8)/2.8);
+        color.setHSL(.22+random()*.055,.28+random()*.065,.325+light*.15+random()*.055);
+        if(random()>density)continue;
+        positions.push(cx+dx,y,cz+dz);colors.push(color.r,color.g,color.b);
+        sizes.push(.045+random()*.018);mobility.push(1);seeds.push(random()*100);
+      }
+    }
+    // Extra volume is concentrated inside the accepted crowns, with sparse fringes.
+    woodlandAnchors.forEach((g,i)=>crown(g.x,g.z,g.base,g.h,2.9,4.05,450,i*1.71));
+    const pairs=new Set();let bridges=0;
+    for(let i=0;i<woodlandAnchors.length&&bridges<20;i++){
+      const a=woodlandAnchors[i];let best=-1,distance=Infinity;
+      for(let j=0;j<woodlandAnchors.length;j++){
+        if(i===j)continue;const b=woodlandAnchors[j],d=(a.x-b.x)**2+(a.z-b.z)**2;
+        if(d<distance&&d>25){best=j;distance=d;}
+      }
+      if(best<0||distance>24*24)continue;
+      const key=[Math.min(i,best),Math.max(i,best)].join(':');if(pairs.has(key))continue;pairs.add(key);
+      const b=woodlandAnchors[best],t=.35+random()*.3,x=a.x+(b.x-a.x)*t,z=a.z+(b.z-a.z)*t;
+      const h=Math.min(a.h,b.h)*(.58+random()*.24);
+      crown(x,z,height(x,z),h,2.5+random()*1.7,2.8+random()*1.6,700,random()*6.28);bridges++;
+    }
+  }
+  densifyWoodland();
+  while(motionWeights.length<sizes.length)motionWeights.push(.85);
+  return{positions,colors,sizes,mobility,seeds,terrainHeight:height,motionWeights};
 }
