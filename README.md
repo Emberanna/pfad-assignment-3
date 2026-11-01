@@ -32,7 +32,7 @@ Open **http://127.0.0.1:4173**. Do not open the HTML directly; the application u
 - **Night / Dusk:** change lighting without rebuilding the scene or interrupting playback. Dusk is the initial mode; the choice is not saved across reloads.
 - Drag, scroll, or use arrow keys to explore. Press **R** or **Reset view** to return.
 - Drop an MP4 or audio file, or click **Bring your own music**. Press Play or Space to start/pause; use the timeline to seek.
-- **Try the demo** loads a 48-second original synthesized study; press Play after loading.
+- **Try the demo** loads the creator-selected 77.72-second recording (`叙事曲4部分.mp4`); press Play after loading.
 - **Response settings** controls sensitivity and movement; zero movement disables swaying.
 - Volume changes playback output without changing the analysis input.
 
@@ -40,7 +40,22 @@ Selected files remain local in the browser and are not uploaded or retained afte
 
 ## Audio response
 
-Real-time RMS, spectral novelty, frequency bands and rhythmic activity drive continuous damped motion envelopes. Every landscape point has an independent phase, sensitivity, trajectory frequency and return parameter; grass chains, branches and trunks can separate and then reassemble around unchanged rest positions. Sparse large points create soft size contrast. AudioWorklet tracks rhythm independently of rendering frame rate, with a spectral fallback. Night/Dusk switching retains these mappings.
+The latest revision improves particle movement speed and its response to music. Quiet passages retain gentle movement, while sustained fast rhythms increase oscillation speed and structural release. Trunk and woody-branch movement is more visible. Grass, tree crowns, branches, trunks and distant trees move along independent fixed axes in the XY plane, with different phases, frequencies, base amplitudes and sensitivities.
+
+Each participating landscape particle follows the same core rule:
+
+> P_i(t) = P0_i + A_i(t) × sin(ω_i × t + φ_i) × D_i
+
+- **P0_i:** the original position of particle i.
+- **A_i(t):** its back-and-forth amplitude, which changes with the music.
+- **ω_i:** its independent oscillation frequency.
+- **φ_i:** its independent initial phase.
+- **D_i:** its fixed movement direction vector.
+
+The shared rule gives each particle an independent back-and-forth path. Every frame calculates position from its rest position, so movement does not accumulate into drift. Music changes amplitude smoothly; sustained energetic passages can release the landscape into wider oscillations, and quieter passages allow it to reconstruct. The implementation uses a continuously integrated rhythm-dependent clock in the frequency term, so changing speed does not reset the phase or cause position jumps. The horizon veil and decorative airborne motes retain their existing behavior.
+
+Motion amplitude and structural release are separate controls within the response mechanism. A short loud beat can increase movement without immediately dissolving the whole scene; sustained high energy or continuous fast rhythmic activity progressively releases its structure. AudioWorklet tracks rhythm independently of rendering frame rate, with a spectral fallback. Night/Dusk switching retains these mappings.
+
 
 ## Project files
 
@@ -51,13 +66,13 @@ Real-time RMS, spectral novelty, frequency bands and rhythmic activity drive con
 | `dist/app.js` | Local playback, audio connections, UI and lighting-button events |
 | `dist/index.html`, `dist/style.css` | English interface, responsive layout and frosted player |
 | `dist/audio-features.js`, `dist/rhythm-*.js` | Audio analysis and audio-clock timing |
-| `dist/assets/` | Bundled Three.js runtime, licensed tree assets and original demo |
+| `dist/assets/` | Bundled Three.js runtime, licensed tree assets and demo recordings |
 | `server.mjs` | Local server with media byte-range support |
 | `tests/` | Audio behavior tests |
 
 ## Validation and limits
 
-Run `npm run check` for syntax and **11 audio/motion tests**. The latest real-browser run passed **26 checks**, covering lighting modes, live audio, independent return envelopes, MP4 loading, drag-and-drop, camera controls and mobile layout, with no captured console errors. See [browser results](docs/motion-browser-validation.json), [individual-particle implementation](docs/INDIVIDUAL_MOTION.md), and [PROCESS.md](PROCESS.md).
+Run `npm run check` for syntax and **13 audio/motion tests**. Historical browser reports in `docs/` describe earlier saved revisions. The current motion revision uses fixed XY-axis oscillation, stronger trunk motion, and sustained fast-rhythm release and acceleration. Normal UI hides all diagnostic overlays. The default demo is now the creator-selected MP4 recording; earlier 48-second demo validation records do not describe this new asset.
 
 The result is stylized point-cloud art, not a photograph or trained Gaussian-splat reconstruction. Tree lighting normals are approximate. The shadow map uses the vegetation's rest pose and does not follow every music-driven movement. Particle shadow softness and detail are limited by a 2048-pixel depth map. First-load asset size and GPU performance vary by device; smaller displays reduce samples and sustained low frame rates reduce pixel ratio. No universal frame-rate claim is made.
 
@@ -65,23 +80,20 @@ Rhythm estimation can struggle with polyphony, legato and noise. MP4 needs a sup
 
 ## User Feedback and Future Improvements
 
-After experiencing the prototype, users gave positive feedback on its visual aesthetics and immersive atmosphere. However, they also identified several areas for improvement.
+Earlier feedback praised the visual aesthetics and immersive atmosphere, but described particle movement as intermittent and found the contrast between calmer and more energetic music insufficiently clear. This led to independent oscillation, more visible displacement, and faster movement and structural release during sustained fast rhythms.
 
-**Music-Responsive Particle Movement**
+**Feedback after the latest revision**
 
-- Particle movement sometimes feels intermittent rather than continuous and natural.
-- The visual responses to moderately slow music and highly energetic music are not sufficiently distinct.
-- The relationship between musical intensity and particle movement needs further refinement to create more expressive and responsive interactions.
+After trying the updated experience, users reported a clear improvement in the particle effects compared with the previous version. Two areas still need attention:
 
-**Customisable Interaction Settings**
+- **Clearer visual contrast between musical examples:** the differences between examples could be more visually pronounced, making changes in musical pace and intensity easier to see.
+- **Returning from the demo to personal music:** users reported that after choosing the demo, they could not return to playing their own preferred songs. Although changing the track is part of the intended workflow, this transition needs investigation and improvement. This remains an unresolved usability issue, rather than a completed fix.
 
-Users also suggested adding more control over the visual experience, allowing them to adjust:
+This feedback reflects the creator's summary of user trials, rather than validation of every musical style or playback path.
 
-- **Particle Size:** Change the size of individual particles.
-- **Movement Speed:** Control how quickly particles move and respond to music.
-- **Movement Distance:** Adjust how far particles travel from their original positions.
+**Previously requested controls**
 
-These improvements could make the experience more responsive to different musical styles while giving users greater control over their personalised visual environment.
+Earlier users also requested separate settings for particle size, movement speed and movement distance. These remain future improvements; the current interface retains its sensitivity and movement controls.
 
 ## Credits
 

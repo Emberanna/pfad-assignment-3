@@ -76,3 +76,8 @@ This snapshot was prepared on 31 October 2026 for the creator's second upload fr
 ## Individual-particle interaction revision — 1 November 2026
 
 Review showed that shared grass-chain seeds, broad spatial waves and a near-fixed trunk still looked like grouped movement. The revision kept all rest positions and colors, introduced independent vertex attributes, enabled trunk participation, and replaced timed burst holds/cooldowns with continuous damped audio envelopes. Fast/slow response banks give particles different return rates. GPU transform feedback checked actual production GLSL on grass, crown and trunk samples; a live recording included close-ups and pause recovery. Eleven automated tests and 26 browser checks passed. See [implementation and limitations](docs/INDIVIDUAL_MOTION.md). Separate user controls for size, speed and distance remain future work. No GitHub commit or push was made by the assistant.
+
+
+## Local motion revision and upload package — 1 November 2026
+
+Replaced composite drift/curl with independent fixed-axis sine oscillation from immutable rest positions. Separated motion amplitude and sustained structural release, increased ordinary displacement after creator review, added fast-rhythm release and continuous speed integration, constrained landscape motion to XY axes, and increased wood-particle displacement by 1.7. Weak-music mapping is retained. Thirteen automated tests passed. Optional F2 diagnostics remain hidden by default. The creator selected 叙事曲4部分.mp4 as the default demo and future tuning track; bundled as dist/assets/ballade-4-excerpt.mp4. The original synthesized study remains available as an asset. This is a local upload package; no commit or push was performed.

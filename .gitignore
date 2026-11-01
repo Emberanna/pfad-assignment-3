@@ -10,3 +10,6 @@ Thumbs.db
 *.m4a
 *.zip
 *.tar.gz
+
+# Explicitly included default demo selected by the project creator
+!dist/assets/ballade-4-excerpt.mp4

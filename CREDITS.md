@@ -27,3 +27,6 @@ The interface uses installed system fonts. No external font service or font file
 ## Tool use
 
 Codex was used for development and revision as described in `PROCESS.md`. Browser audio implementation was informed by [MDN's AnalyserNode documentation](https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode).
+
+
+Default demo for this local revision: creator-provided recording 叙事曲4部分.mp4, supplied on 1 November 2026. It is separate from the original synthesized Meadow Study. Performer and recording source details were not supplied.

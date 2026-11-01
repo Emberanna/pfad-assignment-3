@@ -28,7 +28,7 @@ async function loadTrack(url,name,isDemo=false){
     if(id!==loadId)return;
     if(!Number.isFinite(media.duration)||media.duration<=0)throw new Error('This file has no playable duration. Please choose another audio file or MP4.');
     loading=false;$('playButton').disabled=false;$('seek').disabled=false;$('restart').disabled=false;$('duration').textContent=format(media.duration);status('Track ready · Press Play');
-    if(isDemo)message('Original demo: from gentle to lively, ending softly. You can also choose your own music.');
+    if(isDemo)message('Default demo loaded. Press Play to listen, or choose your own music.');
   }catch(error){if(id!==loadId)return;loading=false;status('Could not load the file');message(error.message,true);}
 }
 async function loadFile(file){
@@ -46,7 +46,7 @@ async function togglePlay(){
 }
 $('chooseFile').addEventListener('click',choose);$('replaceFile').addEventListener('click',choose);fileInput.addEventListener('change',()=>loadFile(fileInput.files[0]));
 $('playButton').addEventListener('click',togglePlay);
-$('demoButton').addEventListener('click',async()=>{await loadTrack('./assets/garden-study.wav','Meadow Study · Original audio demo',true);});
+$('demoButton').addEventListener('click',async()=>{await loadTrack('./assets/ballade-4-excerpt.mp4','叙事曲4部分.mp4',true);});
 $('restart').addEventListener('click',()=>{media.currentTime=0;resetAnalysis();$('seek').value=0;$('currentTime').textContent='00:00';});
 for(const event of ['play','pause','ended'])media.addEventListener(event,syncPlay);
 media.addEventListener('waiting',()=>{if(playing)status('Buffering…');});
@@ -73,6 +73,7 @@ document.addEventListener('visibilitychange',()=>{lastFrame=performance.now();if
 try{garden=await createGarden($('garden'));$('renderStatus').textContent='PARTICLE MEADOW · 3D LIVE';}catch(error){console.error(error);$('renderError').hidden=false;$('renderStatus').textContent='WEBGL UNAVAILABLE';}
 function frequencyBand(lo,hi){let sum=0,n=0;const hz=audioContext.sampleRate/analyser.fftSize;for(let i=Math.max(1,Math.ceil(lo/hz));i<Math.min(spectrum.length,Math.ceil(hi/hz));i++){sum+=spectrum[i]/255;n++;}return sum/Math.max(1,n);}
 function frame(now){
+  const motionDt=Math.max(0,(now-lastFrame)/1000);
   const dt=Math.min(.06,Math.max(.001,(now-lastFrame)/1000));lastFrame=now;
   if(playing&&analyser&&audioContext.state==='running'&&!media.seeking){
     analyser.getFloatTimeDomainData(wave);analyser.getByteFrequencyData(spectrum);
@@ -84,7 +85,7 @@ function frame(now){
     Object.assign(state,features.update(wave,spectrum,audioContext.currentTime,audioDt,Number($('sensitivity').value),rhythmData));
     if(state.energy<.012){noAudioSince??=audioContext.currentTime;if(audioContext.currentTime-noAudioSince>7)message('No sound detected: this may be a silent passage or an MP4 without a usable audio track. Try another file.');}else{if(noAudioSince&&$('message').textContent.startsWith('No sound detected'))message();noAudioSince=null;}
   }else {Object.assign(state,features.idle(dt));for(const key of ['low','mid','high'])state[key]=(state[key]||0)*Math.exp(-dt*4);}
-  Object.assign(state,expressive.update(wave,spectrum,dt,state,!!(playing&&analyser&&audioContext?.state==='running'&&!media.seeking)));
+  Object.assign(state,expressive.update(wave,spectrum,motionDt,state,!!(playing&&analyser&&audioContext?.state==='running'&&!media.seeking)));
   garden?.render(dt,state,Number($('motion').value));
   if(now-lastUI>120){
     lastUI=now;$('energyMeter').style.transform=`scaleX(${state.energy.toFixed(3)})`;
