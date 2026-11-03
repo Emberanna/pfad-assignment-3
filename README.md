@@ -2,6 +2,15 @@
 
 An interactive, audio-reactive 3D particle landscape for people who want to explore a visual environment while listening to their own music. Upload a local recording, start playback, explore the meadow, and switch between Night and Dusk.
 
+## Live website
+
+**[Open Sound in the Arbor](https://emberanna.github.io/pfad-assignment-3/)**
+
+The public HTTPS site is hosted on GitHub Pages. It opens without signing in or running a local server. Choose a local audio file or MP4, or load the demo and press Play. Personal recordings are read locally by the browser.
+
+The deployment workflow in .github/workflows/deploy-pages.yml checks the application and publishes only the dist directory. Changes to dist on main automatically update the website after a successful GitHub Actions run. The Node.js server remains available for local development and is not required by the hosted site.
+
+
 ## Second upload — visual development
 
 This revision focuses on three connected problems: grass density and volume, continuous slopes and depth, and the choice of lighting style. It keeps the landscape entirely particle-based.
