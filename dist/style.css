@@ -61,3 +61,8 @@
 
 /* SVG chevron is centered independently of font metrics. */
 #toggleControls{display:grid;place-items:center;padding:0}#toggleControls svg{display:block;width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}.controls-collapsed #toggleControls svg{width:16px;height:16px;transform:translateY(-.33px)}
+
+/* Arrow-only interaction with a generous invisible touch target. */
+.visual-controls-heading{position:relative;cursor:default}.visual-controls-heading:hover{color:inherit}.visual-controls-heading #toggleControls{position:absolute;right:-6px;top:-7px;width:44px;height:44px;min-width:44px;min-height:44px;cursor:pointer;touch-action:manipulation;user-select:none;z-index:2;border:0;background:transparent}.visual-controls-heading #toggleControls svg{pointer-events:none}.visual-controls.controls-collapsed,.controls-collapsed .visual-controls-heading{width:44px;height:44px}.controls-collapsed .visual-controls-heading #toggleControls{position:relative;inset:auto;border:0;border-radius:50%}.controls-collapsed #toggleControls::before{content:"";position:absolute;inset:6px;border:1px solid rgba(242,246,232,.55);border-radius:50%;pointer-events:none}.controls-collapsed #toggleControls:hover{background:transparent}
+
+.controls-collapsed .visual-controls-heading #toggleControls{border-radius:0}

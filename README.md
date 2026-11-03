@@ -36,7 +36,7 @@ In response to users asking for more control over the particle experience, a **C
 
 Both panels can be folded away to reduce visual obstruction and support a more immersive audiovisual experience:
 
-- **Controls panel:** select the title row or arrow to collapse it. Only a small circular arrow remains on the right; select it to reopen the panel. The panel starts collapsed on smaller screens.
+- **Controls panel:** select the right-hand arrow to collapse it. Only a small circular arrow remains on the right; tap its center or surrounding touch area to reopen the panel. The Controls title itself does not toggle the panel. The panel starts collapsed on smaller screens.
 - **Music player:** during playback, it automatically folds away after a short delay when the pointer is outside its area. Moving the pointer back into the original player area reveals it; moving away lets it fold again. Pausing keeps playback controls visible. On touchscreens, select the small **Music player** tab to reveal them.
 
 Default settings retain bounded, independent particle movement around a stable landscape. Raising animation speed, movement distance and local looseness near their maximum values deliberately blends in wider, interwoven trajectories and a sparse near-camera approach. Lowering these settings or resetting them smoothly restores the default movement. This effect is under the listener's control rather than being forced by every fast passage.

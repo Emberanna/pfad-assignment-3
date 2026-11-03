@@ -4,9 +4,9 @@ export function initVisualControls(media){
  for(const key of Object.keys(defaults)){const slider=document.getElementById('vc-'+key),out=document.getElementById('vo-'+key);slider.addEventListener('input',()=>{visualControls[key]=Number(slider.value);out.textContent=visualControls[key].toFixed(1)+'×';});}
  document.getElementById('resetVisualControls').addEventListener('click',()=>{for(const [key,value]of Object.entries(defaults)){visualControls[key]=value;document.getElementById('vc-'+key).value=value;document.getElementById('vo-'+key).textContent=value.toFixed(1)+'×';}});
  const body=document.getElementById('visualControlsBody'),toggle=document.getElementById('toggleControls');
+ toggle.setAttribute('aria-controls','visualControlsBody');
  function expand(open){document.getElementById('visualControls').classList.toggle('controls-collapsed',!open);body.hidden=!open;toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'Collapse controls':'Expand controls');toggle.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+(open?'M7 14l5-5 5 5':'M7 10l5 5 5-5')+'"/></svg>';toggle.title=open?'Collapse controls':'Expand controls';}
  expand(innerWidth>700);toggle.addEventListener('click',()=>expand(body.hidden));
- document.querySelector('.visual-controls-heading').addEventListener('click',e=>{if(!e.target.closest('button'))expand(body.hidden);});
  const panel=document.querySelector('.music-panel'),dock=document.createElement('div');dock.id='playerDock';dock.className='player-dock';panel.before(dock);dock.append(panel);
  const tab=document.createElement('button');tab.className='player-reveal';tab.textContent='Music player ↑';tab.setAttribute('aria-label','Expand music player');tab.setAttribute('aria-expanded','true');dock.append(tab);
  let timer,pointer=false,touchOpen=false;
