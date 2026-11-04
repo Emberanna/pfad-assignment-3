@@ -1,13 +1,13 @@
 import {extremeControlMix} from './controls.js';
 import * as THREE from './assets/three.module.js';
-import {buildMeadow} from './particle-meadow.js';
+import {buildPhotoArbor} from './photo-arbor.js';
 import {createIndividualAttributes,individualMotionGLSL,sampleMotion} from './particle-motion.js';
 
-// The scene is generated in three dimensions, without photographs or scanned assets.
+// The scene uses photo-sampled particles with estimated depth.
 export async function createGarden(canvas) {
   const renderer = new THREE.WebGLRenderer({canvas, antialias:false, alpha:false, powerPreference:'high-performance'});
   renderer.setPixelRatio(Math.min(devicePixelRatio,1.4));
-  renderer.setClearColor('#302732');
+  renderer.setClearColor('#252922');
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   const scene=new THREE.Scene();
   // Scene lights are the source of the particle shader's illumination uniforms.
@@ -43,7 +43,7 @@ export async function createGarden(canvas) {
     }`});
   const sky=new THREE.Mesh(new THREE.PlaneGeometry(2,2),skyMaterial);sky.frustumCulled=false;sky.renderOrder=-100;scene.add(sky);
   const camera=new THREE.PerspectiveCamera(53,1,.08,320);
-  const {positions,colors,sizes,mobility,seeds,terrainHeight,motionWeights}=await buildMeadow(innerWidth<650);
+  const {positions,colors,sizes,mobility,seeds,terrainHeight,motionWeights,aspect}=await buildPhotoArbor(innerWidth<650);
   let moteSeed=913;const random=()=>{moteSeed=(Math.imul(moteSeed,1664525)+1013904223)|0;return(moteSeed>>>0)/4294967296;};
   const geometry=new THREE.BufferGeometry();
   geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
@@ -56,32 +56,14 @@ export async function createGarden(canvas) {
   // Static, approximate surface normals: terrain gradients for grass and radial
   // plant normals for the sampled tree. No per-frame CPU particle updates.
   const normals=new Float32Array(sizes.length*3),tips=new Float32Array(sizes.length),exposure=new Float32Array(sizes.length);
-  // Dusk-only offsets reuse complete blades; Night retains original geometry.
-  const duskOffsets=new Float32Array(sizes.length*3),relativeTips=new Float32Array(sizes.length);
-  const grassCount=mobility.findIndex(group=>group!==0),bladeStart=Math.floor(grassCount*.30);
-  let redistributed=0;
-  for(let first=bladeStart;first<grassCount;){
-    let end=first+1;while(end<grassCount&&seeds[end]===seeds[first])end++;
-    const bx=positions[first*3],bz=positions[first*3+2],base=positions[first*3+1];
-    const blend=THREE.MathUtils.smoothstep(-bz,28,70)*.82;
-    const hash=Math.abs(Math.sin(seeds[first]*13.71)*43758.5453)%1;
-    const nx=bx*(1-blend*.16),nz=bz+(-23-hash*17-bz)*blend;
-    const dy=terrainHeight(nx,nz)-terrainHeight(bx,bz);
-    const tall=Math.max(.01,positions[(end-1)*3+1]-base);
-    for(let i=first;i<end;i++){
-      const k=i*3;duskOffsets[k]=nx-bx;duskOffsets[k+1]=dy;duskOffsets[k+2]=nz-bz;
-      relativeTips[i]=Math.max(0,Math.min(1,(positions[k+1]-base)/tall));
-      if(blend>.05)redistributed++;
-    }
-    first=end;
-  }
+  const duskOffsets=new Float32Array(sizes.length*3);
   geometry.setAttribute('aDuskOffset',new THREE.BufferAttribute(duskOffsets,3));
   const n=new THREE.Vector3();
   for(let i=0;i<sizes.length;i++){
     const k=i*3,x=positions[k]+duskOffsets[k],y=positions[k+1]+duskOffsets[k+1],z=positions[k+2]+duskOffsets[k+2],ground=terrainHeight(x,z);
     if(mobility[i]===0){
       n.set(-(terrainHeight(x+.1,z)-terrainHeight(x-.1,z))/.2,1,-(terrainHeight(x,z+.1)-terrainHeight(x,z-.1))/.2).normalize();
-      tips[i]=relativeTips[i];
+      tips[i]=0;
     }else{n.set((x-5.3)*.14,(y-ground-3)*.09,(z+10)*.14).normalize();if(n.lengthSq()<.01)n.set(0,1,0);}
     n.toArray(normals,k);
     // Broad exposure transition, not a projected canopy shadow (Stage 3.3).
@@ -169,10 +151,10 @@ export async function createGarden(canvas) {
             visibility+=step(shadowPosition.z-.0008,depth)/9.0;
           }
         }
-        vec3 shaded=mix(unlitColor,mix(ambientColor,vColor,.35+.65*visibility),uDaylight);
+        vec3 shaded=mix(unlitColor*.48,unlitColor,uDaylight);
         shaded*=mix(1.0,.78,vBokeh);
         shaded*=vec3(1.0)+uColorGain*vec3(.35,.12,-.2);
-        gl_FragColor=vec4(mix(shaded,uFog,fog),alpha);
+        gl_FragColor=vec4(mix(shaded,uFog,fog*.18),alpha);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
       }`
@@ -197,7 +179,7 @@ export async function createGarden(canvas) {
   const endDrag=()=>drag=null;canvas.addEventListener('pointerup',endDrag);canvas.addEventListener('pointercancel',endDrag);canvas.addEventListener('lostpointercapture',endDrag);canvas.addEventListener('pointerleave',()=>{hoverX=hoverY=0;});
   canvas.addEventListener('wheel',e=>{e.preventDefault();distance=Math.max(10.7,Math.min(19.5,distance+e.deltaY*.008));},{passive:false});
   canvas.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();if(e.key==='ArrowLeft')targetYaw+=.025;if(e.key==='ArrowRight')targetYaw-=.025;if(e.key==='ArrowUp')targetPitch-=.015;if(e.key==='ArrowDown')targetPitch+=.015;targetYaw=Math.max(-.35,Math.min(.35,targetYaw));targetPitch=Math.max(-.16,Math.min(.19,targetPitch));}});
-  function resize(){const w=canvas.clientWidth,h=canvas.clientHeight;renderer.setSize(w,h,false);const pw=Math.round(w*renderer.getPixelRatio()),ph=Math.round(h*renderer.getPixelRatio());bloomTarget.setSize(pw,ph);bloomMaterial.uniforms.texel.value.set(1/pw,1/ph);camera.aspect=w/h;camera.fov=w<650?64:53;camera.updateProjectionMatrix();uniforms.uScale.value=h*renderer.getPixelRatio()/(2*Math.tan(camera.fov*Math.PI/360));}
+  function resize(){const w=canvas.clientWidth,h=canvas.clientHeight;renderer.setSize(w,h,false);const pw=Math.round(w*renderer.getPixelRatio()),ph=Math.round(h*renderer.getPixelRatio());bloomTarget.setSize(pw,ph);bloomMaterial.uniforms.texel.value.set(1/pw,1/ph);camera.aspect=w/h;camera.fov=2*Math.atan(Math.tan(53*Math.PI/360)*Math.min(1,aspect/camera.aspect))*180/Math.PI;camera.updateProjectionMatrix();uniforms.uScale.value=h*renderer.getPixelRatio()/(2*Math.tan(camera.fov*Math.PI/360));}
   const observer=new ResizeObserver(resize);observer.observe(canvas);resize();
   // Opt-in overlay only; F2 or ?motionDebug=1. Samples are actual geometry vertices.
   let debugOn=new URLSearchParams(location.search).has('motionDebug');
